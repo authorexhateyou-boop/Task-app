@@ -1,9 +1,42 @@
 import { Outlet, NavLink, Link, Navigate } from 'react-router-dom';
 import { Home, PlusSquare, User, Trophy, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useState, useEffect } from 'react';
+import { db } from '../lib/firebase';
+import { doc, updateDoc } from 'firebase/firestore';
 
 export default function Layout() {
-  const { currentUser, isAdmin } = useAuth();
+  const { currentUser, userData, isAdmin } = useAuth();
+  const [showSetup, setShowSetup] = useState(false);
+  const [handle, setHandle] = useState('');
+  const [niche, setNiche] = useState('Tech');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    // If the user's document is loaded but missing the Threads handle, force setup
+    if (userData && !userData.threadsHandle) {
+      setShowSetup(true);
+    } else {
+      setShowSetup(false);
+    }
+  }, [userData]);
+
+  const saveInitialSetup = async () => {
+    if (!userData || !handle) return;
+    setSaving(true);
+    try {
+      await updateDoc(doc(db, 'users', userData.uid), {
+        threadsHandle: handle.startsWith('@') ? handle : `@${handle}`,
+        niche: niche
+      });
+      setShowSetup(false);
+    } catch (e) {
+      console.error(e);
+      alert('Failed to save setup data');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const getDesktopNavClass = ({ isActive }: { isActive: boolean }) => 
     `btn-ghost ${isActive ? 'active' : ''}`;
@@ -67,6 +100,53 @@ export default function Layout() {
       <main className="container animate-enter" style={{ padding: '24px 16px', minHeight: 'calc(100vh - 64px)' }}>
         <Outlet />
       </main>
+
+      {showSetup && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'white', zIndex: 100, display: 'flex', flexDirection: 'column', padding: '24px', justifyContent: 'center' }}>
+          <div className="card" style={{ maxWidth: '400px', margin: '0 auto', width: '100%', padding: '32px 24px' }}>
+            <h2 className="page-title" style={{ textAlign: 'center', marginBottom: '8px' }}>Welcome!</h2>
+            <p className="page-subtitle" style={{ textAlign: 'center', marginBottom: '24px' }}>Let's set up your profile to join the circle.</p>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: 'var(--neutral-800)' }}>Threads Handle</label>
+              <input 
+                value={handle} 
+                onChange={e => setHandle(e.target.value)} 
+                placeholder="@yourhandle" 
+                className="input-field" 
+                style={{ width: '100%' }}
+              />
+            </div>
+            
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: 'var(--neutral-800)' }}>Your Niche</label>
+              <select 
+                value={niche} 
+                onChange={e => setNiche(e.target.value)} 
+                className="input-field" 
+                style={{ width: '100%' }}
+              >
+                <option value="Tech">Tech</option>
+                <option value="Lifestyle">Lifestyle</option>
+                <option value="Gaming">Gaming</option>
+                <option value="Education">Education</option>
+                <option value="Business">Business</option>
+                <option value="Art">Art</option>
+                <option value="General">General</option>
+              </select>
+            </div>
+
+            <button 
+              onClick={saveInitialSetup} 
+              disabled={saving || !handle} 
+              className="btn-primary" 
+              style={{ width: '100%' }}
+            >
+              {saving ? 'Saving...' : 'Complete Profile'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

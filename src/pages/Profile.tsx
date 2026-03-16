@@ -8,18 +8,22 @@ import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 export default function Profile() {
   const { userData, currentUser } = useAuth();
   const [username, setUsername] = useState('CreatorName');
+  const [threadsHandle, setThreadsHandle] = useState('');
+  const [niche, setNiche] = useState('General');
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     if (userData) {
       setUsername(userData.username || '');
+      setThreadsHandle(userData.threadsHandle || '');
+      setNiche(userData.niche || 'General');
       setProfilePic(userData.profilePic || null);
     }
   }, [userData]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // In a real app we'd upload to Firebase Storage
     if (e.target.files && e.target.files[0]) {
       const url = URL.createObjectURL(e.target.files[0]);
       setProfilePic(url);
@@ -32,11 +36,14 @@ export default function Profile() {
     try {
       await updateDoc(doc(db, 'users', userData.uid), {
         username: username,
+        threadsHandle: threadsHandle.startsWith('@') || !threadsHandle ? threadsHandle : `@${threadsHandle}`,
+        niche: niche
       });
-      alert('Profile updated');
+      setEditMode(false);
+      alert('Profile updated and saved!');
     } catch (e) {
       console.error(e);
-      alert('Failed to save');
+      alert('Failed to save profile');
     } finally {
       setSaving(false);
     }
@@ -53,10 +60,7 @@ export default function Profile() {
     if (!confirmDelete) return;
 
     try {
-      // 1. Delete user document from Firestore (Optional cleanup of their tasks could go here)
-      await deleteDoc(doc(db, 'users', userData.uid));
-      
-      // 2. Delete user Auth account
+      if (userData?.uid) await deleteDoc(doc(db, 'users', userData.uid));
       await deleteUser(currentUser);
     } catch (e: any) {
       console.error(e);
@@ -73,10 +77,12 @@ export default function Profile() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <h1 className="page-title" style={{ margin: 0 }}>My Profile</h1>
         <div style={{ display: 'flex', gap: '8px' }}>
-          <button className="btn-ghost" onClick={saveProfile} disabled={saving} style={{ padding: '8px' }}>
-            <Save size={20} color={saving ? 'gray' : 'var(--primary)'} />
-          </button>
-          <button className="btn-ghost" style={{ padding: '8px' }}>
+          {editMode && (
+            <button className="btn-ghost" onClick={saveProfile} disabled={saving} style={{ padding: '8px' }}>
+              <Save size={20} color={saving ? 'gray' : 'var(--primary)'} />
+            </button>
+          )}
+          <button className="btn-ghost" onClick={() => setEditMode(!editMode)} style={{ padding: '8px', color: editMode ? 'var(--primary)' : 'var(--neutral-800)' }}>
             <Settings size={20} />
           </button>
         </div>
@@ -89,24 +95,59 @@ export default function Profile() {
           ) : (
             <div className="avatar avatar-lg">{username ? username.charAt(0).toUpperCase() : '?'}</div>
           )}
-          <label style={{ position: 'absolute', bottom: 0, right: 0, backgroundColor: 'white', border: '1px solid var(--neutral-200)', borderRadius: '50%', padding: '6px', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}>
-            <Camera size={16} color="var(--neutral-600)" />
-            <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
-          </label>
+          {editMode && (
+            <label style={{ position: 'absolute', bottom: 0, right: 0, backgroundColor: 'white', border: '1px solid var(--neutral-200)', borderRadius: '50%', padding: '6px', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}>
+              <Camera size={16} color="var(--neutral-600)" />
+              <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
+            </label>
+          )}
         </div>
         
-        <input 
-          value={username} 
-          onChange={(e) => setUsername(e.target.value)} 
-          className="input-field" 
-          style={{ width: '100%', textAlign: 'center', fontSize: '20px', fontWeight: 700, border: 'none', background: 'transparent', padding: 0, marginBottom: '4px' }}
-        />
-        <p style={{ color: 'var(--neutral-600)', marginBottom: '16px' }}>
-          {userData?.threadsHandle || '@threads_handle'} • {userData?.niche || 'Add Niche'}
-        </p>
+        {editMode ? (
+          <>
+            <input 
+              value={username} 
+              onChange={(e) => setUsername(e.target.value)} 
+              className="input-field" 
+              style={{ width: '100%', textAlign: 'center', fontSize: '20px', fontWeight: 700, border: 'none', background: 'var(--neutral-100)', padding: '4px', marginBottom: '8px', borderRadius: '4px' }}
+              placeholder="Display Name"
+            />
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+              <input 
+                value={threadsHandle} 
+                onChange={(e) => setThreadsHandle(e.target.value)} 
+                className="input-field" 
+                style={{ width: '120px', textAlign: 'center', fontSize: '14px', border: 'none', background: 'var(--neutral-100)', padding: '4px', color: 'var(--neutral-800)', borderRadius: '4px' }}
+                placeholder="@threads"
+              />
+              <span style={{ color: 'var(--neutral-600)' }}>•</span>
+              <select 
+                value={niche} 
+                onChange={(e) => setNiche(e.target.value)} 
+                className="input-field" 
+                style={{ width: '100px', textAlign: 'center', fontSize: '14px', border: 'none', background: 'var(--neutral-100)', padding: '4px', color: 'var(--neutral-800)', borderRadius: '4px' }}
+              >
+                <option value="Tech">Tech</option>
+                <option value="Lifestyle">Lifestyle</option>
+                <option value="Gaming">Gaming</option>
+                <option value="Education">Education</option>
+                <option value="Business">Business</option>
+                <option value="Art">Art</option>
+                <option value="General">General</option>
+              </select>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2 style={{ fontSize: '20px', fontWeight: 700, margin: '0 0 4px 0' }}>{username}</h2>
+            <p style={{ color: 'var(--neutral-600)', marginBottom: '16px' }}>
+              {threadsHandle || '@threads_handle'} • {niche || 'General'}
+            </p>
+          </>
+        )}
         
         <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-          <span className="badge badge-green">Circle 1 Starter</span>
+          <span className="badge badge-green">Circle Starter</span>
           <span className="badge badge-gray">Task Score: {userData?.taskScore || 0}</span>
         </div>
       </div>
