@@ -8,6 +8,7 @@ interface Task {
   id: string;
   creatorId: string;
   creatorName: string;
+  creatorAvatar?: string | null;
   threadsHandle: string;
   niche: string;
   completionCount: number;
@@ -145,20 +146,27 @@ export default function Home() {
           filteredTasks.map((task) => (
             <div key={task.id} className="card" style={{ padding: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                  <h3 style={{ fontWeight: 600, fontSize: '18px' }}>{task.creatorName}</h3>
-                  <p style={{ color: 'var(--neutral-600)', fontSize: '14px', marginBottom: '8px' }}>
-                    <a 
-                      href={`https://threads.net/${task.threadsHandle?.replace('@', '')}`} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 500 }}
-                    >
-                      {task.threadsHandle}
-                    </a> • {task.niche}
-                  </p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--neutral-600)', fontSize: '12px' }}>
-                    <CheckCircle size={14} /> {task.completionCount || 0} completions
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  {task.creatorAvatar ? (
+                    <img src={task.creatorAvatar} alt={task.creatorName} className="avatar avatar-md" />
+                  ) : (
+                    <div className="avatar avatar-md">{task.creatorName ? task.creatorName.charAt(0).toUpperCase() : '?'}</div>
+                  )}
+                  <div>
+                    <h3 style={{ fontWeight: 600, fontSize: '18px' }}>{task.creatorName}</h3>
+                    <p style={{ color: 'var(--neutral-600)', fontSize: '14px', marginBottom: '8px' }}>
+                      <a 
+                        href={`https://threads.net/${task.threadsHandle?.replace('@', '')}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 500 }}
+                      >
+                        {task.threadsHandle}
+                      </a> • {task.niche}
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--neutral-600)', fontSize: '12px' }}>
+                      <CheckCircle size={14} /> {task.completionCount || 0} completions
+                    </div>
                   </div>
                 </div>
 

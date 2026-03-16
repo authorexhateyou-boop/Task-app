@@ -36,6 +36,7 @@ export default function PostTask() {
       await addDoc(collection(db, 'tasks'), {
         creatorId: userData.uid,
         creatorName: userData.username,
+        creatorAvatar: userData.profilePic || null,
         threadsHandle: userData.threadsHandle,
         niche: userData.niche || 'General',
         createdAt: serverTimestamp(),

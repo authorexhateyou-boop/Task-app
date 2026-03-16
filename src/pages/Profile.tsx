@@ -11,6 +11,7 @@ export default function Profile() {
   const [threadsHandle, setThreadsHandle] = useState('');
   const [niche, setNiche] = useState('General');
   const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [editMode, setEditMode] = useState(false);
 
@@ -25,7 +26,9 @@ export default function Profile() {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const url = URL.createObjectURL(e.target.files[0]);
+      const file = e.target.files[0];
+      setImageFile(file);
+      const url = URL.createObjectURL(file);
       setProfilePic(url);
     }
   };
@@ -34,12 +37,25 @@ export default function Profile() {
     if (!userData) return;
     setSaving(true);
     try {
+      let downloadURL = profilePic;
+
+      // If there's a new file to upload
+      if (imageFile) {
+        const { ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
+        const { storage } = await import('../lib/firebase');
+        const storageRef = ref(storage, `profile_pics/${userData.uid}`);
+        const snapshot = await uploadBytes(storageRef, imageFile);
+        downloadURL = await getDownloadURL(snapshot.ref);
+      }
+
       await updateDoc(doc(db, 'users', userData.uid), {
         username: username,
         threadsHandle: threadsHandle.startsWith('@') || !threadsHandle ? threadsHandle : `@${threadsHandle}`,
-        niche: niche
+        niche: niche,
+        profilePic: downloadURL
       });
       setEditMode(false);
+      setImageFile(null);
       alert('Profile updated and saved!');
     } catch (e) {
       console.error(e);
