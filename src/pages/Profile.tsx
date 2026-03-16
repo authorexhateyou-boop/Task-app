@@ -159,7 +159,7 @@ export default function Profile() {
             <FileText size={20} />
           </div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: '18px' }}>0</div>
+            <div style={{ fontWeight: 700, fontSize: '18px' }}>{userData?.tasksPosted || 0}</div>
             <div style={{ fontSize: '12px', color: 'var(--neutral-600)' }}>Posted</div>
           </div>
         </div>
@@ -168,7 +168,7 @@ export default function Profile() {
             <CheckCircle size={20} />
           </div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: '18px' }}>0</div>
+            <div style={{ fontWeight: 700, fontSize: '18px' }}>{userData?.tasksCompleted || 0}</div>
             <div style={{ fontSize: '12px', color: 'var(--neutral-600)' }}>Completed</div>
           </div>
         </div>

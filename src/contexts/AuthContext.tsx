@@ -14,6 +14,8 @@ export interface UserData {
   streak: number;
   profilePic?: string;
   isAdmin?: boolean;
+  tasksPosted?: number;
+  tasksCompleted?: number;
 }
 
 interface AuthContextType {

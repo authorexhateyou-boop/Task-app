@@ -1,16 +1,36 @@
-import { PlusCircle } from 'lucide-react';
-import { useState } from 'react';
+import { PlusCircle, CheckCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs, updateDoc, doc, increment } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 
 export default function PostTask() {
   const { userData } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [hasActiveTask, setHasActiveTask] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    const checkActiveTasks = async () => {
+      if (!userData) return;
+      try {
+        const q = query(collection(db, 'tasks'), where('creatorId', '==', userData.uid));
+        const snapshot = await getDocs(q);
+        if (!snapshot.empty) {
+          setHasActiveTask(true);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setChecking(false);
+      }
+    };
+    checkActiveTasks();
+  }, [userData]);
 
   const handleSubmit = async () => {
-    if (!userData || !userData.threadsHandle) return;
+    if (!userData || !userData.threadsHandle || hasActiveTask) return;
     setLoading(true);
     try {
       await addDoc(collection(db, 'tasks'), {
@@ -22,6 +42,11 @@ export default function PostTask() {
         completionCount: 0,
         isActive: true
       });
+      // Increment tasksPosted stat
+      await updateDoc(doc(db, 'users', userData.uid), {
+        tasksPosted: increment(1)
+      });
+      setHasActiveTask(true);
       alert('Task posted successfully! Check the Home feed.');
     } catch (error) {
       console.error(error);
@@ -37,13 +62,30 @@ export default function PostTask() {
       <p className="page-subtitle">Submit your Threads profile for today's circle drop.</p>
 
       <div className="card" style={{ padding: '32px 24px', textAlign: 'center' }}>
-        {!userData?.threadsHandle ? (
+        {checking ? (
+          <div style={{ color: 'var(--neutral-600)' }}>Checking your circle status...</div>
+        ) : !userData?.threadsHandle ? (
           <div>
             <div style={{ marginBottom: '16px', color: 'var(--danger)' }}>
               You need to set up your Threads Handle first!
             </div>
             <Link to="/profile" className="btn-secondary" style={{ display: 'inline-flex' }}>
               Go to Profile Settings
+            </Link>
+          </div>
+        ) : hasActiveTask ? (
+          <div>
+            <div style={{ marginBottom: '24px' }}>
+              <CheckCircle size={48} color="var(--primary)" style={{ margin: '0 auto 16px' }} />
+              <h2 style={{ fontSize: '20px', fontWeight: 700, margin: '0 0 8px 0', color: 'var(--neutral-800)' }}>
+                You're in the circle!
+              </h2>
+              <p style={{ color: 'var(--neutral-600)' }}>
+                Your task is currently live. Complete other creator tasks to boost your score while you wait!
+              </p>
+            </div>
+            <Link to="/" className="btn-primary" style={{ display: 'inline-flex' }}>
+              Go to Home Feed
             </Link>
           </div>
         ) : (
@@ -71,7 +113,7 @@ export default function PostTask() {
       </div>
 
       <div style={{ marginTop: '24px', backgroundColor: 'var(--accent)', color: 'var(--primary-hover)', padding: '16px', borderRadius: 'var(--radius-md)', fontSize: '14px' }}>
-        <strong>Reminder:</strong> You can only post one task per day. Make sure you also complete tasks to maintain your score!
+        <strong>Reminder:</strong> You can only post one task at a time. Make sure you also complete tasks to maintain your score!
       </div>
     </div>
   );

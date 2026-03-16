@@ -47,10 +47,11 @@ export default function Home() {
       await updateDoc(doc(db, 'users', creatorId), {
         taskScore: increment(1)
       });
-      // Increment current user score
+      // Increment current user score & completion stat
       if (userData?.uid) {
         await updateDoc(doc(db, 'users', userData.uid), {
-          taskScore: increment(5)
+          taskScore: increment(5),
+          tasksCompleted: increment(1)
         });
       }
     } catch (e) {
