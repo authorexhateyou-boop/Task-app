@@ -1,4 +1,4 @@
-import { CheckCircle, ExternalLink, Trash2 } from 'lucide-react';
+import { CheckCircle, ExternalLink, Trash2, User as UserIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, increment, deleteDoc, limit } from 'firebase/firestore';
@@ -8,7 +8,6 @@ interface Task {
   id: string;
   creatorId: string;
   creatorName: string;
-  creatorAvatar?: string | null;
   threadsHandle: string;
   niche: string;
   completionCount: number;
@@ -32,7 +31,6 @@ export default function Home() {
   }, [completedTaskIds]);
 
   useEffect(() => {
-    // Limit to 50 most recent tasks for performance scaling
     const q = query(
       collection(db, 'tasks'), 
       orderBy('createdAt', 'desc'),
@@ -82,12 +80,25 @@ export default function Home() {
     return isPending && matchesNiche;
   });
 
+  const getAvatarStyle = (name: string) => {
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5', '#9B59B6'];
+    const index = (name?.length || 0) % colors.length;
+    return {
+      backgroundColor: colors[index],
+      color: 'white',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontWeight: 700,
+      fontSize: '18px'
+    };
+  };
+
   return (
     <div>
       <h1 className="page-title">Daily Circle</h1>
       <p className="page-subtitle">Support others to grow your reputation.</p>
 
-      {/* Niche Filter Bar */}
       <div style={{ 
         display: 'flex', 
         gap: '8px', 
@@ -147,11 +158,12 @@ export default function Home() {
             <div key={task.id} className="card" style={{ padding: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', gap: '12px' }}>
-                  {task.creatorAvatar ? (
-                    <img src={task.creatorAvatar} alt={task.creatorName} className="avatar avatar-md" />
-                  ) : (
-                    <div className="avatar avatar-md">{task.creatorName ? task.creatorName.charAt(0).toUpperCase() : '?'}</div>
-                  )}
+                  <div 
+                    className="avatar avatar-md" 
+                    style={getAvatarStyle(task.creatorName || 'U')}
+                  >
+                    {task.creatorName ? task.creatorName.charAt(0).toUpperCase() : <UserIcon size={18} />}
+                  </div>
                   <div>
                     <h3 style={{ fontWeight: 600, fontSize: '18px' }}>{task.creatorName}</h3>
                     <p style={{ color: 'var(--neutral-600)', fontSize: '14px', marginBottom: '8px' }}>

@@ -1,4 +1,4 @@
-import { Activity, Medal } from 'lucide-react';
+import { Activity, Medal, User as UserIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
@@ -9,7 +9,6 @@ interface BaseUser {
   threadsHandle?: string;
   taskScore: number;
   streak: number;
-  profilePic?: string;
 }
 
 export default function Leaderboard() {
@@ -28,6 +27,20 @@ export default function Leaderboard() {
     return () => unsubscribe();
   }, []);
 
+  const getAvatarStyle = (name: string) => {
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5', '#9B59B6'];
+    const index = (name?.length || 0) % colors.length;
+    return {
+      backgroundColor: colors[index],
+      color: 'white',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontWeight: 700,
+      fontSize: '16px'
+    };
+  };
+
   return (
     <div>
       <h1 className="page-title">Top Members</h1>
@@ -43,11 +56,12 @@ export default function Leaderboard() {
                 {rank <= 3 ? <Medal size={24} /> : `#${rank}`}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                {user.profilePic ? (
-                  <img src={user.profilePic} alt={user.username} className="avatar avatar-md" />
-                ) : (
-                  <div className="avatar avatar-md">{user.username ? user.username.charAt(0).toUpperCase() : '?'}</div>
-                )}
+                <div 
+                  className="avatar avatar-md" 
+                  style={getAvatarStyle(user.username || 'U')}
+                >
+                  {user.username ? user.username.charAt(0).toUpperCase() : <UserIcon size={16} />}
+                </div>
                 <div>
                   <h3 style={{ fontWeight: 600, fontSize: '16px' }}>{user.username}</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--neutral-600)', fontSize: '12px' }}>

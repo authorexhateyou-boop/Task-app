@@ -1,4 +1,4 @@
-import { Settings, LogOut, FileText, CheckCircle, Camera, Save, Trash2 } from 'lucide-react';
+import { Settings, LogOut, FileText, CheckCircle, Save, Trash2, User as UserIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { auth, db } from '../lib/firebase';
@@ -7,11 +7,9 @@ import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 export default function Profile() {
   const { userData, currentUser } = useAuth();
-  const [username, setUsername] = useState('CreatorName');
+  const [username, setUsername] = useState('');
   const [threadsHandle, setThreadsHandle] = useState('');
   const [niche, setNiche] = useState('General');
-  const [profilePic, setProfilePic] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [editMode, setEditMode] = useState(false);
 
@@ -20,42 +18,19 @@ export default function Profile() {
       setUsername(userData.username || '');
       setThreadsHandle(userData.threadsHandle || '');
       setNiche(userData.niche || 'General');
-      setProfilePic(userData.profilePic || null);
     }
   }, [userData]);
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImageFile(file);
-      const url = URL.createObjectURL(file);
-      setProfilePic(url);
-    }
-  };
 
   const saveProfile = async () => {
     if (!userData) return;
     setSaving(true);
     try {
-      let downloadURL = profilePic;
-
-      // If there's a new file to upload
-      if (imageFile) {
-        const { ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
-        const { storage } = await import('../lib/firebase');
-        const storageRef = ref(storage, `profile_pics/${userData.uid}`);
-        const snapshot = await uploadBytes(storageRef, imageFile);
-        downloadURL = await getDownloadURL(snapshot.ref);
-      }
-
       await updateDoc(doc(db, 'users', userData.uid), {
         username: username,
         threadsHandle: threadsHandle.startsWith('@') || !threadsHandle ? threadsHandle : `@${threadsHandle}`,
-        niche: niche,
-        profilePic: downloadURL
+        niche: niche
       });
       setEditMode(false);
-      setImageFile(null);
       alert('Profile updated and saved!');
     } catch (e) {
       console.error(e);
@@ -88,6 +63,21 @@ export default function Profile() {
     }
   };
 
+  // Helper for colorful avatars without storage
+  const getAvatarStyle = (name: string) => {
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5', '#9B59B6'];
+    const index = (name?.length || 0) % colors.length;
+    return {
+      backgroundColor: colors[index],
+      color: 'white',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontWeight: 800,
+      fontSize: '32px'
+    };
+  };
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
@@ -105,18 +95,14 @@ export default function Profile() {
       </div>
 
       <div className="card" style={{ textAlign: 'center', padding: '32px 24px', marginBottom: '24px' }}>
-        <div style={{ position: 'relative', width: '96px', height: '96px', margin: '0 auto 16px' }}>
-          {profilePic ? (
-            <img src={profilePic} alt="Profile" className="avatar avatar-lg" />
-          ) : (
-            <div className="avatar avatar-lg">{username ? username.charAt(0).toUpperCase() : '?'}</div>
-          )}
-          {editMode && (
-            <label style={{ position: 'absolute', bottom: 0, right: 0, backgroundColor: 'white', border: '1px solid var(--neutral-200)', borderRadius: '50%', padding: '6px', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}>
-              <Camera size={16} color="var(--neutral-600)" />
-              <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
-            </label>
-          )}
+        <div 
+          className="avatar avatar-lg" 
+          style={{ 
+            margin: '0 auto 16px', 
+            ...getAvatarStyle(username || 'U') 
+          }}
+        >
+          {username ? username.charAt(0).toUpperCase() : <UserIcon size={40} />}
         </div>
         
         {editMode ? (
