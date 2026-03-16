@@ -1,24 +1,63 @@
-import { Settings, LogOut, FileText, CheckCircle, Camera } from 'lucide-react';
-import { useState } from 'react';
+import { Settings, LogOut, FileText, CheckCircle, Camera, Save } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { auth, db } from '../lib/firebase';
+import { signOut } from 'firebase/auth';
+import { doc, updateDoc } from 'firebase/firestore';
 
 export default function Profile() {
+  const { userData } = useAuth();
   const [username, setUsername] = useState('CreatorName');
   const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (userData) {
+      setUsername(userData.username || '');
+      setProfilePic(userData.profilePic || null);
+    }
+  }, [userData]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // In a real app we'd upload to Firebase Storage
     if (e.target.files && e.target.files[0]) {
       const url = URL.createObjectURL(e.target.files[0]);
       setProfilePic(url);
     }
   };
 
+  const saveProfile = async () => {
+    if (!userData) return;
+    setSaving(true);
+    try {
+      await updateDoc(doc(db, 'users', userData.uid), {
+        username: username,
+      });
+      alert('Profile updated');
+    } catch (e) {
+      console.error(e);
+      alert('Failed to save');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSignout = () => {
+    signOut(auth);
+  };
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <h1 className="page-title" style={{ margin: 0 }}>My Profile</h1>
-        <button className="btn-ghost" style={{ padding: '8px' }}>
-          <Settings size={20} />
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button className="btn-ghost" onClick={saveProfile} disabled={saving} style={{ padding: '8px' }}>
+            <Save size={20} color={saving ? 'gray' : 'var(--primary)'} />
+          </button>
+          <button className="btn-ghost" style={{ padding: '8px' }}>
+            <Settings size={20} />
+          </button>
+        </div>
       </div>
 
       <div className="card" style={{ textAlign: 'center', padding: '32px 24px', marginBottom: '24px' }}>
@@ -40,11 +79,13 @@ export default function Profile() {
           className="input-field" 
           style={{ width: '100%', textAlign: 'center', fontSize: '20px', fontWeight: 700, border: 'none', background: 'transparent', padding: 0, marginBottom: '4px' }}
         />
-        <p style={{ color: 'var(--neutral-600)', marginBottom: '16px' }}>@threads_handle • Lifestyle</p>
+        <p style={{ color: 'var(--neutral-600)', marginBottom: '16px' }}>
+          {userData?.threadsHandle || '@threads_handle'} • {userData?.niche || 'Add Niche'}
+        </p>
         
         <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
           <span className="badge badge-green">Circle 1 Starter</span>
-          <span className="badge badge-gray">Task Score: 125</span>
+          <span className="badge badge-gray">Task Score: {userData?.taskScore || 0}</span>
         </div>
       </div>
 
@@ -55,7 +96,7 @@ export default function Profile() {
             <FileText size={20} />
           </div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: '18px' }}>12</div>
+            <div style={{ fontWeight: 700, fontSize: '18px' }}>0</div>
             <div style={{ fontSize: '12px', color: 'var(--neutral-600)' }}>Posted</div>
           </div>
         </div>
@@ -64,13 +105,13 @@ export default function Profile() {
             <CheckCircle size={20} />
           </div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: '18px' }}>48</div>
+            <div style={{ fontWeight: 700, fontSize: '18px' }}>0</div>
             <div style={{ fontSize: '12px', color: 'var(--neutral-600)' }}>Completed</div>
           </div>
         </div>
       </div>
 
-      <button className="btn-secondary" style={{ width: '100%', color: 'var(--danger)', borderColor: 'var(--danger-bg)' }}>
+      <button onClick={handleSignout} className="btn-secondary" style={{ width: '100%', color: 'var(--danger)', borderColor: 'var(--danger-bg)' }}>
         <LogOut size={16} /> Sign out
       </button>
     </div>

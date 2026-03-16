@@ -1,9 +1,16 @@
-import { Outlet, NavLink, Link } from 'react-router-dom';
+import { Outlet, NavLink, Link, Navigate } from 'react-router-dom';
 import { Home, PlusSquare, User, Trophy } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Layout() {
+  const { currentUser } = useAuth();
+
   const getDesktopNavClass = ({ isActive }: { isActive: boolean }) => 
     `btn-ghost ${isActive ? 'active' : ''}`;
+
+  if (!currentUser) {
+    return <Navigate to="/login" />;
+  }
 
   return (
     <div>
