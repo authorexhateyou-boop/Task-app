@@ -1,12 +1,12 @@
-import { Settings, LogOut, FileText, CheckCircle, Camera, Save } from 'lucide-react';
+import { Settings, LogOut, FileText, CheckCircle, Camera, Save, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { auth, db } from '../lib/firebase';
-import { signOut } from 'firebase/auth';
-import { doc, updateDoc } from 'firebase/firestore';
+import { signOut, deleteUser } from 'firebase/auth';
+import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 export default function Profile() {
-  const { userData } = useAuth();
+  const { userData, currentUser } = useAuth();
   const [username, setUsername] = useState('CreatorName');
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -44,6 +44,28 @@ export default function Profile() {
 
   const handleSignout = () => {
     signOut(auth);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!currentUser || !userData) return;
+    
+    const confirmDelete = window.confirm("Are you sure you want to completely delete your TASK account? This action cannot be undone.");
+    if (!confirmDelete) return;
+
+    try {
+      // 1. Delete user document from Firestore (Optional cleanup of their tasks could go here)
+      await deleteDoc(doc(db, 'users', userData.uid));
+      
+      // 2. Delete user Auth account
+      await deleteUser(currentUser);
+    } catch (e: any) {
+      console.error(e);
+      if (e.code === 'auth/requires-recent-login') {
+        alert("For security reasons, please sign out, sign back in, and try deleting your account again.");
+      } else {
+        alert("Failed to delete account. See console for details.");
+      }
+    }
   };
 
   return (
@@ -111,9 +133,14 @@ export default function Profile() {
         </div>
       </div>
 
-      <button onClick={handleSignout} className="btn-secondary" style={{ width: '100%', color: 'var(--danger)', borderColor: 'var(--danger-bg)' }}>
-        <LogOut size={16} /> Sign out
-      </button>
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <button onClick={handleSignout} className="btn-secondary" style={{ flex: 1, color: 'var(--neutral-800)' }}>
+          <LogOut size={16} /> Sign out
+        </button>
+        <button onClick={handleDeleteAccount} className="btn-secondary" style={{ flex: 1, color: 'var(--danger)', borderColor: 'var(--danger-bg)' }}>
+          <Trash2 size={16} /> Delete Account
+        </button>
+      </div>
     </div>
   );
 }
