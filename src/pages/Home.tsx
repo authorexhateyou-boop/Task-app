@@ -1,7 +1,7 @@
-import { CheckCircle, ExternalLink } from 'lucide-react';
+import { CheckCircle, ExternalLink, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, increment } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, increment, deleteDoc } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
 
 interface Task {
@@ -59,6 +59,18 @@ export default function Home() {
     }
   };
 
+  const deleteTask = async (taskId: string) => {
+    const confirm = window.confirm("Are you sure you want to delete your task from the daily circle?");
+    if (!confirm) return;
+
+    try {
+      await deleteDoc(doc(db, 'tasks', taskId));
+    } catch (e) {
+      console.error(e);
+      alert("Failed to delete task.");
+    }
+  };
+
   const filteredTasks = tasks.filter(task => {
     if (filter === 'all') return true;
     return !completedTaskIds.includes(task.id);
@@ -105,7 +117,18 @@ export default function Home() {
                 </div>
               </div>
 
-              {completedTaskIds.includes(task.id) ? (
+              {userData?.uid === task.creatorId ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div className="badge badge-gray" style={{ padding: '6px 12px', textAlign: 'center' }}>Your Task</div>
+                  <button 
+                    className="btn-secondary" 
+                    style={{ padding: '8px 12px', color: 'var(--danger)', borderColor: 'var(--danger-bg)' }}
+                    onClick={() => deleteTask(task.id)}
+                  >
+                    <Trash2 size={14} /> Delete
+                  </button>
+                </div>
+              ) : completedTaskIds.includes(task.id) ? (
                 <div className="badge badge-green" style={{ padding: '6px 12px' }}>Done</div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
