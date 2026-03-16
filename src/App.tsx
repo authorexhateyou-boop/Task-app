@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Profile from './pages/Profile';
 import Leaderboard from './pages/Leaderboard';
 import PostTask from './pages/PostTask';
+import Admin from './pages/Admin';
 import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
             <Route path="post" element={<PostTask />} />
             <Route path="profile" element={<Profile />} />
             <Route path="leaderboard" element={<Leaderboard />} />
+            <Route path="admin" element={<Admin />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Route>
         </Routes>

@@ -1,9 +1,9 @@
 import { Outlet, NavLink, Link, Navigate } from 'react-router-dom';
-import { Home, PlusSquare, User, Trophy } from 'lucide-react';
+import { Home, PlusSquare, User, Trophy, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Layout() {
-  const { currentUser } = useAuth();
+  const { currentUser, isAdmin } = useAuth();
 
   const getDesktopNavClass = ({ isActive }: { isActive: boolean }) => 
     `btn-ghost ${isActive ? 'active' : ''}`;
@@ -27,6 +27,11 @@ export default function Layout() {
             <NavLink to="/leaderboard" className={getDesktopNavClass} style={({isActive}) => isActive ? { color: 'var(--primary)', backgroundColor: 'var(--accent)' } : {}}>
               <Trophy size={18} /> Leaders
             </NavLink>
+            {isAdmin && (
+              <NavLink to="/admin" className={getDesktopNavClass} style={({isActive}) => isActive ? { color: 'var(--primary)', backgroundColor: 'var(--accent)' } : {}}>
+                <ShieldCheck size={18} /> Admin
+              </NavLink>
+            )}
             <NavLink to="/profile" className={getDesktopNavClass} style={({isActive}) => isActive ? { color: 'var(--primary)', backgroundColor: 'var(--accent)' } : {}}>
               <User size={18} /> Profile
             </NavLink>
@@ -47,6 +52,12 @@ export default function Layout() {
           <Trophy size={22} />
           Leaders
         </NavLink>
+        {isAdmin && (
+          <NavLink to="/admin" className="nav-item">
+            <ShieldCheck size={22} />
+            Admin
+          </NavLink>
+        )}
         <NavLink to="/profile" className="nav-item">
           <User size={22} />
           Profile

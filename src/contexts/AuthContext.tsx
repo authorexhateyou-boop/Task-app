@@ -4,7 +4,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
-interface UserData {
+export interface UserData {
   uid: string;
   username: string;
   email: string;
@@ -13,15 +13,17 @@ interface UserData {
   taskScore: number;
   streak: number;
   profilePic?: string;
+  isAdmin?: boolean;
 }
 
 interface AuthContextType {
   currentUser: User | null;
   userData: UserData | null;
   loading: boolean;
+  isAdmin: boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({ currentUser: null, userData: null, loading: true });
+const AuthContext = createContext<AuthContextType>({ currentUser: null, userData: null, loading: true, isAdmin: false });
 
 export function useAuth() {
   return useContext(AuthContext);
@@ -63,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, userData, loading }}>
+    <AuthContext.Provider value={{ currentUser, userData, loading, isAdmin: userData?.isAdmin || false }}>
         {!loading && children}
     </AuthContext.Provider>
   );
