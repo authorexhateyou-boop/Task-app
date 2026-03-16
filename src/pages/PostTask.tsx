@@ -1,4 +1,4 @@
-import { PlusCircle, ExternalLink } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';

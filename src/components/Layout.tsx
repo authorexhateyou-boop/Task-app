@@ -8,6 +8,7 @@ import { doc, updateDoc } from 'firebase/firestore';
 export default function Layout() {
   const { currentUser, userData, isAdmin } = useAuth();
   const [showSetup, setShowSetup] = useState(false);
+  const [username, setUsername] = useState('');
   const [handle, setHandle] = useState('');
   const [niche, setNiche] = useState('Tech');
   const [saving, setSaving] = useState(false);
@@ -15,6 +16,7 @@ export default function Layout() {
   useEffect(() => {
     // If the user's document is loaded but missing the Threads handle, force setup
     if (userData && !userData.threadsHandle) {
+      setUsername(userData.username || '');
       setShowSetup(true);
     } else {
       setShowSetup(false);
@@ -22,10 +24,11 @@ export default function Layout() {
   }, [userData]);
 
   const saveInitialSetup = async () => {
-    if (!userData || !handle) return;
+    if (!userData || !handle || !username) return;
     setSaving(true);
     try {
       await updateDoc(doc(db, 'users', userData.uid), {
+        username: username,
         threadsHandle: handle.startsWith('@') ? handle : `@${handle}`,
         niche: niche
       });
@@ -108,6 +111,17 @@ export default function Layout() {
             <p className="page-subtitle" style={{ textAlign: 'center', marginBottom: '24px' }}>Let's set up your profile to join the circle.</p>
 
             <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: 'var(--neutral-800)' }}>Display Name</label>
+              <input 
+                value={username} 
+                onChange={e => setUsername(e.target.value)} 
+                placeholder="Jane Doe" 
+                className="input-field" 
+                style={{ width: '100%' }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
               <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: 'var(--neutral-800)' }}>Threads Handle</label>
               <input 
                 value={handle} 
@@ -138,7 +152,7 @@ export default function Layout() {
 
             <button 
               onClick={saveInitialSetup} 
-              disabled={saving || !handle} 
+              disabled={saving || !handle || !username} 
               className="btn-primary" 
               style={{ width: '100%' }}
             >

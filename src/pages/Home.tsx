@@ -91,7 +91,14 @@ export default function Home() {
               <div>
                 <h3 style={{ fontWeight: 600, fontSize: '18px' }}>{task.creatorName}</h3>
                 <p style={{ color: 'var(--neutral-600)', fontSize: '14px', marginBottom: '8px' }}>
-                  {task.threadsHandle} • {task.niche}
+                  <a 
+                    href={`https://threads.net/${task.threadsHandle}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 500 }}
+                  >
+                    {task.threadsHandle}
+                  </a> • {task.niche}
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--neutral-600)', fontSize: '12px' }}>
                   <CheckCircle size={14} /> {task.completionCount} completions
