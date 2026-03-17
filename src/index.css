@@ -149,12 +149,13 @@ input, select, textarea {
   height: 100%;
 }
 .logo {
-  font-weight: 800;
-  font-size: 24px;
-  letter-spacing: -0.02em;
+  font-weight: 900;
+  font-size: 26px;
+  letter-spacing: -0.04em;
   color: var(--primary);
   display: flex;
   align-items: center;
+  text-transform: uppercase;
 }
 
 .desktop-nav {
@@ -211,7 +212,10 @@ input, select, textarea {
     color: var(--primary);
   }
   .header-content {
-    justify-content: center; /* Center logo on mobile */
+    justify-content: space-between; /* Keep logo left on mobile too */
+  }
+  .logo {
+    font-size: 22px;
   }
   main.container {
     padding-bottom: 88px !important; /* space for bottom nav */
@@ -249,6 +253,7 @@ input, select, textarea {
   color: var(--primary);
   letter-spacing: -0.05em;
   animation: pulse 1s infinite alternate;
+  text-transform: uppercase;
 }
 @keyframes pulse {
   0% { transform: scale(0.95); }

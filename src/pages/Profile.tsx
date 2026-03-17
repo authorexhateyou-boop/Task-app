@@ -1,4 +1,4 @@
-import { Settings, LogOut, FileText, CheckCircle, Save, Trash2, User as UserIcon } from 'lucide-react';
+import { Settings, LogOut, FileText, CheckCircle, Save, Trash2, User as UserIcon, Heart } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { auth, db } from '../lib/firebase';
@@ -176,12 +176,25 @@ export default function Profile() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '8px' }}>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
         <button onClick={handleSignout} className="btn-secondary" style={{ flex: 1, color: 'var(--neutral-800)' }}>
           <LogOut size={16} /> Sign out
         </button>
         <button onClick={handleDeleteAccount} className="btn-secondary" style={{ flex: 1, color: 'var(--danger)', borderColor: 'var(--danger-bg)' }}>
           <Trash2 size={16} /> Delete Account
+        </button>
+      </div>
+
+      <div className="card" style={{ padding: '24px', border: '2px dashed var(--primary)', backgroundColor: 'var(--accent)', textAlign: 'center' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '8px', color: 'var(--primary-hover)' }}>Love TASK?</h3>
+        <p style={{ fontSize: '13px', color: 'var(--neutral-800)', marginBottom: '16px' }}>Support the app to keep it alive!</p>
+        
+        <button 
+          className="btn-primary" 
+          style={{ width: '100%', borderRadius: 'var(--radius-full)', fontSize: '16px', padding: '12px' }}
+          onClick={() => window.open('https://buy.stripe.com/bJe9AS7UF0yg3d6guz7kc01', '_blank')}
+        >
+          <Heart size={18} fill="white" /> Support $5
         </button>
       </div>
     </div>
