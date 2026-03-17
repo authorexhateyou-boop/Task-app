@@ -140,21 +140,8 @@ export default function Home() {
           </div>
         )}
 
-        {/* Sticky Mobile Category Bar */}
-        <div style={{ 
-          position: 'sticky', 
-          top: '0',
-          zIndex: 10,
-          backgroundColor: '#f8fafc', // match background
-          margin: '0 -24px 24px -24px', // bleed out to edges
-          padding: '12px 24px',
-          display: 'flex', 
-          gap: '8px', 
-          overflowX: 'auto', 
-          msOverflowStyle: 'none',
-          scrollbarWidth: 'none',
-          boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-        }}>
+        {/* Sticky Category Bar */}
+        <div className="category-bar">
           {niches.map(n => (
             <button
               key={n}
