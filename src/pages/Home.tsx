@@ -1,4 +1,4 @@
-import { CheckCircle, ExternalLink, Trash2, User as UserIcon, Heart, Trophy, LogIn, Clock } from 'lucide-react';
+import { CheckCircle, ExternalLink, Trash2, User as UserIcon, Heart, Trophy } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, increment, deleteDoc, limit } from 'firebase/firestore';
@@ -113,19 +113,6 @@ export default function Home() {
     };
   };
 
-  const getTimeAgo = (timestamp: any) => {
-    if (!timestamp) return 'just now';
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
-    
-    if (seconds < 60) return 'just now';
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-    const days = Math.floor(hours / 24);
-    return `${days}d ago`;
-  };
 
   return (
     <div className="home-grid">
@@ -134,13 +121,11 @@ export default function Home() {
         <p className="page-subtitle">Support others to grow your reputation.</p>
 
         {!currentUser && (
-          <div className="card animate-enter" style={{ backgroundColor: 'var(--accent)', border: '1px solid var(--primary)', padding: '24px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
-            <div style={{ minWidth: '200px' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--primary-hover)', marginBottom: '4px' }}>Welcome Passenger! ✈️</h3>
-              <p style={{ fontSize: '14px', color: 'var(--neutral-800)' }}>You are in <strong>Guest Mode</strong>. Watch the circle growth, but sign in to participate.</p>
-            </div>
-            <Link to="/login" className="btn-primary" style={{ whiteSpace: 'nowrap', display: 'flex', gap: '8px' }}>
-              <LogIn size={18} /> Join Now
+          <div className="card animate-enter" style={{ backgroundColor: '#F0FDF4', borderColor: 'var(--primary)', marginBottom: '24px', textAlign: 'center' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--primary-hover)', marginBottom: '4px' }}>Welcome Passenger! ✈️</h3>
+            <p style={{ fontSize: '14px', color: 'var(--neutral-600)', marginBottom: '16px' }}>Participants earn points and grow their reputation. Sign in to start your journey.</p>
+            <Link to="/login" className="btn-primary" style={{ width: '100%', borderRadius: 'var(--radius-md)' }}>
+              Join the Circle
             </Link>
           </div>
         )}
@@ -160,18 +145,18 @@ export default function Home() {
             ))}
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+          <div className="filter-bar">
             <button 
               onClick={() => setFilter('pending')}
               className={`badge ${filter === 'pending' ? 'badge-green' : 'badge-gray'}`}
-              style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
+              style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0, border: 'none' }}
             >
               Pending ({tasks.filter(t => !completedTaskIds.includes(t.id)).length})
             </button>
             <button 
               onClick={() => setFilter('all')}
               className={`badge ${filter === 'all' ? 'badge-green' : 'badge-gray'}`}
-              style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
+              style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0, border: 'none' }}
             >
               All ({tasks.length})
             </button>
@@ -188,22 +173,22 @@ export default function Home() {
               filteredTasks.map((task) => (
                 <div key={task.id} className="card animate-enter">
                   {/* Card Header: Avatar & Name */}
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '8px', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '6px', marginBottom: '12px' }}>
                     <div 
                       className="avatar avatar-md" 
-                      style={{ ...getAvatarStyle(task.creatorName || 'U'), width: '48px', height: '48px' }}
+                      style={{ ...getAvatarStyle(task.creatorName || 'U') }}
                     >
-                      {task.creatorName ? task.creatorName.charAt(0).toUpperCase() : <UserIcon size={20} />}
+                      {task.creatorName ? task.creatorName.charAt(0).toUpperCase() : <UserIcon size={18} />}
                     </div>
                     <div style={{ width: '100%', minWidth: 0 }}>
-                      <h3 style={{ fontWeight: 700, fontSize: '15px', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <h3 style={{ fontWeight: 800, fontSize: '14px', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--neutral-900)' }}>
                         {task.creatorName}
                       </h3>
                       <a 
                         href={getFormatHandle(task.threadsHandle)} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, fontSize: '12px', display: 'block', marginTop: '2px' }}
+                        style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, fontSize: '11px', display: 'block', marginTop: '1px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                       >
                         {task.threadsHandle.startsWith('@') ? task.threadsHandle : `@${task.threadsHandle}`}
                       </a>
@@ -211,14 +196,11 @@ export default function Home() {
                   </div>
 
                   {/* Task Metadata */}
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
-                    <span className="badge badge-gray" style={{ fontSize: '10px' }}>{task.niche}</span>
-                    <span style={{ fontSize: '11px', color: 'var(--neutral-500)', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginBottom: '14px', flexWrap: 'wrap' }}>
+                    <span className="badge badge-gray" style={{ fontSize: '9px', padding: '2px 6px' }}>{task.niche}</span>
+                    <div style={{ fontSize: '11px', color: 'var(--neutral-500)', display: 'flex', alignItems: 'center', gap: '3px' }}>
                       <CheckCircle size={10} /> {task.completionCount || 0}
-                    </span>
-                    <span style={{ fontSize: '11px', color: 'var(--neutral-400)', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                      <Clock size={10} /> {getTimeAgo(task.createdAt)}
-                    </span>
+                    </div>
                   </div>
 
                   {/* Action Section */}
@@ -226,13 +208,13 @@ export default function Home() {
                     {userData?.uid === task.creatorId ? (
                       <button 
                         className="btn-secondary" 
-                        style={{ padding: '8px', color: 'var(--danger)', borderColor: 'var(--danger-bg)', width: '100%', fontSize: '12px' }}
+                        style={{ padding: '8px', color: 'var(--danger)', borderColor: 'var(--danger-bg)', width: '100%', fontSize: '12px', borderRadius: 'var(--radius-md)' }}
                         onClick={() => deleteTask(task.id)}
                       >
-                        <Trash2 size={14} /> Delete
+                        <Trash2 size={13} /> Delete
                       </button>
                     ) : completedTaskIds.includes(task.id) ? (
-                      <div className="badge badge-green" style={{ width: '100%', height: '36px', justifyContent: 'center' }}>Done</div>
+                      <div className="badge badge-green" style={{ width: '100%', height: '34px', justifyContent: 'center', borderRadius: 'var(--radius-md)', fontSize: '12px' }}>Done</div>
                     ) : (
                       <>
                         <a 
@@ -240,13 +222,13 @@ export default function Home() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="btn-secondary" 
-                          style={{ width: '100%', padding: '8px', fontSize: '12px' }}
+                          style={{ width: '100%', padding: '7px', fontSize: '12px', borderRadius: 'var(--radius-md)' }}
                         >
-                          <ExternalLink size={14} /> View
+                          <ExternalLink size={13} /> View
                         </a>
                         <button 
                           className={`btn-primary ${!currentUser ? 'disabled' : ''}`}
-                          style={{ width: '100%', padding: '8px', opacity: !currentUser ? 0.6 : 1, fontSize: '12px' }}
+                          style={{ width: '100%', padding: '7px', opacity: !currentUser ? 0.6 : 1, fontSize: '12px', borderRadius: 'var(--radius-md)' }}
                           onClick={() => markComplete(task.id, task.creatorId)}
                         >
                           Mark Done
