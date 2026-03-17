@@ -76,7 +76,11 @@ export default function Home() {
 
   const getFormatHandle = (handle: string) => {
     if (!handle) return '#';
-    const clean = handle.trim().replace(/^@/, '');
+    // Robust cleaning: handle full URLs, multiple @ symbols, and trailing spaces
+    const parts = handle.trim().split('/');
+    let clean = parts[parts.length - 1] || handle;
+    clean = clean.replace(/@/g, '').split('?')[0]; // Remove @ and query params
+    if (!clean) return '#';
     return `https://www.threads.net/@${clean}`;
   };
 
@@ -130,8 +134,8 @@ export default function Home() {
         <p className="page-subtitle">Support others to grow your reputation.</p>
 
         {!currentUser && (
-          <div className="card animate-enter" style={{ backgroundColor: 'var(--accent)', border: '1px solid var(--primary)', padding: '24px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
-            <div>
+          <div className="card animate-enter" style={{ backgroundColor: 'var(--accent)', border: '1px solid var(--primary)', padding: '24px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+            <div style={{ minWidth: '200px' }}>
               <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--primary-hover)', marginBottom: '4px' }}>Welcome Passenger! ✈️</h3>
               <p style={{ fontSize: '14px', color: 'var(--neutral-800)' }}>You are in <strong>Guest Mode</strong>. Watch the circle growth, but sign in to participate.</p>
             </div>
@@ -168,18 +172,18 @@ export default function Home() {
           ))}
         </div>
 
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none' }}>
           <button 
             onClick={() => setFilter('pending')}
             className={`badge ${filter === 'pending' ? 'badge-green' : 'badge-gray'}`}
-            style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', cursor: 'pointer' }}
+            style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', cursor: 'pointer', whiteSpace: 'nowrap' }}
           >
             Not Completed ({tasks.filter(t => !completedTaskIds.includes(t.id)).length})
           </button>
           <button 
             onClick={() => setFilter('all')}
             className={`badge ${filter === 'all' ? 'badge-green' : 'badge-gray'}`}
-            style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', cursor: 'pointer' }}
+            style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', cursor: 'pointer', whiteSpace: 'nowrap' }}
           >
             All Tasks ({tasks.length})
           </button>
@@ -194,50 +198,51 @@ export default function Home() {
             </div>
           ) : (
             filteredTasks.map((task) => (
-              <div key={task.id} className="card animate-enter" style={{ padding: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div style={{ display: 'flex', gap: '12px' }}>
+              <div key={task.id} className="card animate-enter" style={{ padding: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+                  <div style={{ display: 'flex', gap: '12px', flex: '1', minWidth: '200px' }}>
                     <div 
                       className="avatar avatar-md" 
-                      style={getAvatarStyle(task.creatorName || 'U')}
+                      style={{ ...getAvatarStyle(task.creatorName || 'U'), flexShrink: 0 }}
                     >
                       {task.creatorName ? task.creatorName.charAt(0).toUpperCase() : <UserIcon size={18} />}
                     </div>
-                    <div>
-                      <h3 style={{ fontWeight: 600, fontSize: '18px' }}>{task.creatorName}</h3>
-                      <p style={{ color: 'var(--neutral-600)', fontSize: '14px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ minWidth: 0 }}>
+                      <h3 style={{ fontWeight: 700, fontSize: '16px', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.creatorName}</h3>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px', color: 'var(--neutral-600)', fontSize: '13px', marginBottom: '8px' }}>
                         <a 
                           href={getFormatHandle(task.threadsHandle)} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 500 }}
+                          style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}
                         >
-                          {task.threadsHandle}
+                          {task.threadsHandle.startsWith('@') ? task.threadsHandle : `@${task.threadsHandle}`}
                         </a>
-                        <span>•</span>
-                        <span>{task.niche}</span>
-                        <span>•</span>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', opacity: 0.8 }}>
-                          <Clock size={12} /> {getTimeAgo(task.createdAt)}
+                        <span style={{ opacity: 0.5 }}>•</span>
+                        <span style={{ fontWeight: 500 }}>{task.niche}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--neutral-500)', fontSize: '12px' }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <CheckCircle size={14} /> {task.completionCount || 0}
                         </span>
-                      </p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--neutral-600)', fontSize: '12px' }}>
-                        <CheckCircle size={14} /> {task.completionCount || 0} completions
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <Clock size={14} /> {getTimeAgo(task.createdAt)}
+                        </span>
                       </div>
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px', width: '100%', justifyContent: 'flex-end', marginTop: '4px' }}>
                     {userData?.uid === task.creatorId ? (
                       <button 
                         className="btn-secondary" 
-                        style={{ padding: '8px 12px', color: 'var(--danger)', borderColor: 'var(--danger-bg)' }}
+                        style={{ padding: '8px 12px', color: 'var(--danger)', borderColor: 'var(--danger-bg)', flex: '1', maxWidth: '120px' }}
                         onClick={() => deleteTask(task.id)}
                       >
                         <Trash2 size={14} /> Delete
                       </button>
                     ) : completedTaskIds.includes(task.id) ? (
-                      <div className="badge badge-green" style={{ padding: '8px 16px', textAlign: 'center' }}>Done</div>
+                      <div className="badge badge-green" style={{ padding: '8px 24px', flex: '1', maxWidth: '120px', justifyContent: 'center' }}>Done</div>
                     ) : (
                       <>
                         <a 
@@ -245,16 +250,16 @@ export default function Home() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="btn-secondary" 
-                          style={{ padding: '8px 12px' }}
+                          style={{ padding: '8px 12px', flex: '1', maxWidth: '120px' }}
                         >
-                          <ExternalLink size={14} /> Open Link
+                          <ExternalLink size={14} /> View
                         </a>
                         <button 
                           className={`btn-primary ${!currentUser ? 'disabled' : ''}`}
-                          style={{ padding: '8px 12px', opacity: !currentUser ? 0.6 : 1 }}
+                          style={{ padding: '8px 12px', opacity: !currentUser ? 0.6 : 1, flex: '1', maxWidth: '140px' }}
                           onClick={() => markComplete(task.id, task.creatorId)}
                         >
-                          Mark Complete
+                          Done
                         </button>
                       </>
                     )}
