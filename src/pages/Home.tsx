@@ -1,4 +1,4 @@
-import { CheckCircle, ExternalLink, Trash2, User as UserIcon, Heart, Trophy } from 'lucide-react';
+import { CheckCircle, ExternalLink, Trash2, User as UserIcon, Heart, Trophy, Instagram, Twitter, Music2, AtSign } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, increment, deleteDoc, limit } from 'firebase/firestore';
@@ -10,6 +10,9 @@ interface Task {
   creatorId: string;
   creatorName: string;
   threadsHandle: string;
+  instagramHandle?: string;
+  twitterHandle?: string;
+  tiktokHandle?: string;
   niche: string;
   completionCount: number;
   isActive: boolean;
@@ -74,14 +77,16 @@ export default function Home() {
     }
   };
 
-  const getFormatHandle = (handle: string) => {
+  const getSocialUrl = (platform: string, handle: string) => {
     if (!handle) return '#';
-    // Robust cleaning: handle full URLs, multiple @ symbols, and trailing spaces
-    const parts = handle.trim().split('/');
-    let clean = parts[parts.length - 1] || handle;
-    clean = clean.replace(/@/g, '').split('?')[0]; // Remove @ and query params
-    if (!clean) return '#';
-    return `https://www.threads.net/@${clean}`;
+    const clean = handle.trim().replace(/^@/, '');
+    switch(platform) {
+      case 'threads': return `https://www.threads.net/@${clean}`;
+      case 'instagram': return `https://www.instagram.com/${clean}`;
+      case 'twitter': return `https://twitter.com/${clean}`;
+      case 'tiktok': return `https://www.tiktok.com/@${clean}`;
+      default: return '#';
+    }
   };
 
   const deleteTask = async (taskId: string) => {
@@ -192,15 +197,34 @@ export default function Home() {
                       
                       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                         <a 
-                          href={getFormatHandle(task.threadsHandle)} 
+                          href={getSocialUrl('threads', task.threadsHandle)} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, fontSize: '13px' }}
+                          style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}
                         >
-                          {task.threadsHandle.startsWith('@') ? task.threadsHandle : `@${task.threadsHandle}`}
+                          <AtSign size={14} /> {task.threadsHandle}
                         </a>
-                        <span style={{ fontSize: '12px', color: 'var(--neutral-400)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <CheckCircle size={12} /> {task.completionCount || 0} supporters
+                        
+                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                          {task.instagramHandle && (
+                            <a href={getSocialUrl('instagram', task.instagramHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#E1306C' }} title="Instagram">
+                              <Instagram size={18} />
+                            </a>
+                          )}
+                          {task.twitterHandle && (
+                            <a href={getSocialUrl('twitter', task.twitterHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#1DA1F2' }} title="X (Twitter)">
+                              <Twitter size={18} />
+                            </a>
+                          )}
+                          {task.tiktokHandle && (
+                            <a href={getSocialUrl('tiktok', task.tiktokHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#000000' }} title="TikTok">
+                              <Music2 size={18} />
+                            </a>
+                          )}
+                        </div>
+
+                        <span style={{ fontSize: '13px', color: 'var(--neutral-500)', display: 'flex', alignItems: 'center', gap: '4px', marginLeft: 'auto' }}>
+                          <CheckCircle size={14} /> {task.completionCount || 0}
                         </span>
                       </div>
                     </div>
@@ -220,14 +244,14 @@ export default function Home() {
                       ) : (
                         <>
                           <a 
-                            href={getFormatHandle(task.threadsHandle)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="btn-secondary" 
-                            style={{ padding: '10px 16px' }}
-                          >
-                            <ExternalLink size={16} />
-                          </a>
+                          href={getSocialUrl('threads', task.threadsHandle)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn-secondary" 
+                          style={{ padding: '10px 16px' }}
+                        >
+                          <ExternalLink size={16} />
+                        </a>
                           <button 
                             className={`btn-primary ${!currentUser ? 'disabled' : ''}`}
                             style={{ padding: '10px 20px', opacity: !currentUser ? 0.6 : 1 }}

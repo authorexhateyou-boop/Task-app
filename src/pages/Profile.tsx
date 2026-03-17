@@ -1,4 +1,4 @@
-import { Settings, LogOut, FileText, CheckCircle, Save, Trash2, User as UserIcon, Heart } from 'lucide-react';
+import { Settings, LogOut, FileText, CheckCircle, Save, Trash2, User as UserIcon, Heart, Instagram, Twitter, Music2, AtSign } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { auth, db } from '../lib/firebase';
@@ -9,6 +9,9 @@ export default function Profile() {
   const { userData, currentUser } = useAuth();
   const [username, setUsername] = useState('');
   const [threadsHandle, setThreadsHandle] = useState('');
+  const [instagramHandle, setInstagramHandle] = useState('');
+  const [twitterHandle, setTwitterHandle] = useState('');
+  const [tiktokHandle, setTiktokHandle] = useState('');
   const [niche, setNiche] = useState('General');
   const [saving, setSaving] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -17,6 +20,9 @@ export default function Profile() {
     if (userData) {
       setUsername(userData.username || '');
       setThreadsHandle(userData.threadsHandle || '');
+      setInstagramHandle(userData.instagramHandle || '');
+      setTwitterHandle(userData.twitterHandle || '');
+      setTiktokHandle(userData.tiktokHandle || '');
       setNiche(userData.niche || 'General');
     }
   }, [userData]);
@@ -24,14 +30,21 @@ export default function Profile() {
   const saveProfile = async () => {
     if (!userData) return;
     setSaving(true);
+    
+    // Helper to clean handles
+    const clean = (h: string) => h.trim().replace(/^@/, '');
+
     try {
       await updateDoc(doc(db, 'users', userData.uid), {
-        username: username,
-        threadsHandle: threadsHandle.startsWith('@') || !threadsHandle ? threadsHandle : `@${threadsHandle}`,
+        username: username.trim(),
+        threadsHandle: threadsHandle ? `@${clean(threadsHandle)}` : '',
+        instagramHandle: instagramHandle ? `@${clean(instagramHandle)}` : '',
+        twitterHandle: twitterHandle ? `@${clean(twitterHandle)}` : '',
+        tiktokHandle: tiktokHandle ? `@${clean(tiktokHandle)}` : '',
         niche: niche
       });
       setEditMode(false);
-      alert('Profile updated and saved!');
+      alert('Profile updated!');
     } catch (e) {
       console.error(e);
       alert('Failed to save profile');
@@ -78,10 +91,16 @@ export default function Profile() {
     };
   };
 
-  const getFormatHandle = (handle: string) => {
+  const getSocialUrl = (platform: string, handle: string) => {
     if (!handle) return '#';
     const clean = handle.trim().replace(/^@/, '');
-    return `https://www.threads.net/@${clean}`;
+    switch(platform) {
+      case 'threads': return `https://www.threads.net/@${clean}`;
+      case 'instagram': return `https://www.instagram.com/${clean}`;
+      case 'twitter': return `https://twitter.com/${clean}`;
+      case 'tiktok': return `https://www.tiktok.com/@${clean}`;
+      default: return '#';
+    }
   };
 
   return (
@@ -120,46 +139,87 @@ export default function Profile() {
               style={{ width: '100%', textAlign: 'center', fontSize: '20px', fontWeight: 700, border: 'none', background: 'var(--neutral-100)', padding: '4px', marginBottom: '8px', borderRadius: '4px' }}
               placeholder="Display Name"
             />
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-              <input 
-                value={threadsHandle} 
-                onChange={(e) => setThreadsHandle(e.target.value)} 
-                className="input-field" 
-                style={{ width: '120px', textAlign: 'center', fontSize: '14px', border: 'none', background: 'var(--neutral-100)', padding: '4px', color: 'var(--neutral-800)', borderRadius: '4px' }}
-                placeholder="@threads"
-              />
-              <span style={{ color: 'var(--neutral-600)' }}>•</span>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '8px 12px', borderRadius: 'var(--radius-md)', gap: '8px' }}>
+                <AtSign size={14} color="var(--neutral-600)" />
+                <input 
+                  value={threadsHandle} 
+                  onChange={(e) => setThreadsHandle(e.target.value)} 
+                  className="input-field" 
+                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '14px', width: '100%' }}
+                  placeholder="Threads"
+                />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '8px 12px', borderRadius: 'var(--radius-md)', gap: '8px' }}>
+                <Instagram size={14} color="#E1306C" />
+                <input 
+                  value={instagramHandle} 
+                  onChange={(e) => setInstagramHandle(e.target.value)} 
+                  className="input-field" 
+                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '14px', width: '100%' }}
+                  placeholder="Instagram"
+                />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '8px 12px', borderRadius: 'var(--radius-md)', gap: '8px' }}>
+                <Twitter size={14} color="#1DA1F2" />
+                <input 
+                  value={twitterHandle} 
+                  onChange={(e) => setTwitterHandle(e.target.value)} 
+                  className="input-field" 
+                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '14px', width: '100%' }}
+                  placeholder="Twitter"
+                />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '8px 12px', borderRadius: 'var(--radius-md)', gap: '8px' }}>
+                <Music2 size={14} color="#000000" />
+                <input 
+                  value={tiktokHandle} 
+                  onChange={(e) => setTiktokHandle(e.target.value)} 
+                  className="input-field" 
+                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '14px', width: '100%' }}
+                  placeholder="TikTok"
+                />
+              </div>
+            </div>
+            
+            <div style={{ marginBottom: '20px' }}>
               <select 
                 value={niche} 
                 onChange={(e) => setNiche(e.target.value)} 
                 className="input-field" 
-                style={{ width: '100px', textAlign: 'center', fontSize: '14px', border: 'none', background: 'var(--neutral-100)', padding: '4px', color: 'var(--neutral-800)', borderRadius: '4px' }}
+                style={{ width: '100%', fontSize: '14px', background: 'var(--accent)', border: '1px solid var(--primary)', borderRadius: 'var(--radius-md)', padding: '8px 12px', textAlign: 'center', fontWeight: 600 }}
               >
-                <option value="Tech">Tech</option>
-                <option value="Lifestyle">Lifestyle</option>
-                <option value="Gaming">Gaming</option>
-                <option value="Education">Education</option>
-                <option value="Business">Business</option>
-                <option value="Art">Art</option>
-                <option value="General">General</option>
+                {['General', 'Tech', 'Lifestyle', 'Gaming', 'Education', 'Business', 'Art'].map(n => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
               </select>
             </div>
           </>
         ) : (
           <>
-            <h2 style={{ fontSize: '20px', fontWeight: 700, margin: '0 0 4px 0' }}>{username}</h2>
-            <p style={{ color: 'var(--neutral-600)', marginBottom: '16px' }}>
-              <a 
-                href={getFormatHandle(threadsHandle)}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}
-              >
-                {threadsHandle || '@threads_handle'}
-              </a>
-              <span style={{ margin: '0 8px' }}>•</span>
-              {niche || 'General'}
-            </p>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '20px' }}>
+              <span className="badge badge-gray" style={{ fontSize: '12px' }}>{niche}</span>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <a href={getSocialUrl('threads', threadsHandle)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--neutral-800)' }}>
+                  <AtSign size={18} />
+                </a>
+                {userData?.instagramHandle && (
+                  <a href={getSocialUrl('instagram', userData.instagramHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#E1306C' }}>
+                    <Instagram size={18} />
+                  </a>
+                )}
+                {userData?.twitterHandle && (
+                  <a href={getSocialUrl('twitter', userData.twitterHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#000000' }}>
+                    <Twitter size={18} />
+                  </a>
+                )}
+                {userData?.tiktokHandle && (
+                  <a href={getSocialUrl('tiktok', userData.tiktokHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#000000' }}>
+                    <Music2 size={18} />
+                  </a>
+                )}
+              </div>
+            </div>
           </>
         )}
         

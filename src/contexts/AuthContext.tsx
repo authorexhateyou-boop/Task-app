@@ -8,7 +8,10 @@ export interface UserData {
   uid: string;
   username: string;
   email: string;
-  threadsHandle?: string;
+  threadsHandle: string;
+  instagramHandle?: string;
+  twitterHandle?: string;
+  tiktokHandle?: string;
   niche?: string;
   taskScore: number;
   streak: number;
@@ -51,6 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             uid: user.uid,
             username: user.email?.split('@')[0] || 'User',
             email: user.email || '',
+            threadsHandle: '',
             taskScore: 0,
             streak: 0
           };
