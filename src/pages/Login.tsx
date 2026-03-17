@@ -12,6 +12,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [rememberMe, setRememberMe] = useState(true);
 
   useEffect(() => {
     if (currentUser) {
@@ -25,6 +26,9 @@ export default function Login() {
     setError('');
     
     try {
+      const { setPersistence, browserLocalPersistence, browserSessionPersistence } = await import('firebase/auth');
+      await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
       } else {
@@ -78,7 +82,13 @@ export default function Login() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <input type="checkbox" id="remember" style={{ cursor: 'pointer' }} defaultChecked />
+            <input 
+              type="checkbox" 
+              id="remember" 
+              style={{ cursor: 'pointer' }} 
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
             <label htmlFor="remember" style={{ fontSize: '14px', color: 'var(--neutral-600)', cursor: 'pointer' }}>Remember me</label>
           </div>
 
