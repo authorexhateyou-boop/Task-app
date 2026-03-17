@@ -147,18 +147,19 @@ export default function Home() {
               key={n}
               onClick={() => setNicheFilter(n)}
               style={{
-                padding: '8px 16px',
-                borderRadius: '20px',
-                fontSize: '13px',
-                fontWeight: 600,
+                padding: '8px 18px',
+                borderRadius: '24px',
+                fontSize: '14px',
+                fontWeight: 700,
                 whiteSpace: 'nowrap',
-                border: '1px solid',
+                border: '1.5px solid',
                 borderColor: nicheFilter === n ? 'var(--primary)' : 'var(--neutral-200)',
-                backgroundColor: nicheFilter === n ? 'var(--accent)' : 'white',
-                color: nicheFilter === n ? 'var(--primary)' : 'var(--neutral-600)',
+                backgroundColor: nicheFilter === n ? 'var(--primary)' : 'white',
+                color: nicheFilter === n ? 'white' : 'var(--neutral-600)',
                 cursor: 'pointer',
-                transition: 'all 0.2s',
-                flexShrink: 0
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                flexShrink: 0,
+                boxShadow: nicheFilter === n ? '0 4px 12px rgba(22, 163, 74, 0.2)' : 'none'
               }}
             >
               {n}
