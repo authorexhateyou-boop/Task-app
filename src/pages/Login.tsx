@@ -87,15 +87,27 @@ export default function Login() {
           </button>
         </form>
 
-        <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '14px', color: 'var(--neutral-600)' }}>
-          {isLogin ? "Don't have an account? " : "Already have an account? "}
-          <button 
-            type="button" 
-            onClick={() => setIsLogin(!isLogin)}
-            style={{ color: 'var(--primary)', fontWeight: 600 }}
-          >
-            {isLogin ? 'Sign up' : 'Log in'}
-          </button>
+        <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '14px', color: 'var(--neutral-600)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div>
+            {isLogin ? "Don't have an account? " : "Already have an account? "}
+            <button 
+              type="button" 
+              onClick={() => setIsLogin(!isLogin)}
+              style={{ color: 'var(--primary)', fontWeight: 600 }}
+            >
+              {isLogin ? 'Sign up' : 'Log in'}
+            </button>
+          </div>
+          
+          <div style={{ paddingTop: '12px', borderTop: '1px solid var(--neutral-100)' }}>
+             <button 
+               type="button" 
+               onClick={() => navigate('/')}
+               style={{ color: 'var(--neutral-500)', fontSize: '13px', textDecoration: 'underline' }}
+             >
+               Skip for now, just browsing ➜
+             </button>
+          </div>
         </div>
       </div>
     </div>
