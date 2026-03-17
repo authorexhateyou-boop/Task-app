@@ -2,6 +2,8 @@ import { Activity, Medal, User as UserIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { useAuth } from '../contexts/AuthContext';
+import { Link } from 'react-router-dom';
 
 interface BaseUser {
   uid: string;
@@ -82,6 +84,13 @@ export default function Leaderboard() {
           </div>
         )})}
       </div>
+
+      {!useAuth().currentUser && (
+        <div className="card" style={{ marginTop: '24px', textAlign: 'center', backgroundColor: 'var(--neutral-100)', border: 'none' }}>
+           <p style={{ fontSize: '14px', color: 'var(--neutral-600)', marginBottom: '16px' }}>Want to see your name on the board?</p>
+           <Link to="/login" className="btn-primary" style={{ display: 'inline-flex' }}>Start Climbing Today</Link>
+        </div>
+      )}
     </div>
   );
 }

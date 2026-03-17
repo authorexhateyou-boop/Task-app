@@ -52,6 +52,24 @@ export default function Admin() {
     }
   };
 
+  const resetStats = async (uid: string) => {
+    const confirm = window.confirm('Are you sure you want to RESET all stats for this user to zero?');
+    if (!confirm) return;
+
+    try {
+      await updateDoc(doc(db, 'users', uid), {
+        taskScore: 0,
+        tasksPosted: 0,
+        tasksCompleted: 0,
+        streak: 0
+      });
+      alert('User stats reset to zero');
+    } catch (e) {
+      console.error(e);
+      alert('Failed to reset stats');
+    }
+  };
+
   if (!isAdmin) {
     return <Navigate to="/" />;
   }
@@ -88,6 +106,13 @@ export default function Admin() {
                   onClick={() => removeScore(user.uid, user.taskScore || 0)}
                 >
                   <AlertTriangle size={14} /> Penalize -50
+                </button>
+                <button 
+                  className="btn-secondary" 
+                  style={{ padding: '6px 12px', color: 'var(--neutral-600)' }}
+                  onClick={() => resetStats(user.uid)}
+                >
+                  Reset Stats
                 </button>
                 <button 
                   className="btn-secondary" 

@@ -1,5 +1,5 @@
-import { Outlet, NavLink, Link, Navigate } from 'react-router-dom';
-import { Home, PlusSquare, User, Trophy, ShieldCheck } from 'lucide-react';
+import { Outlet, NavLink, Link, Navigate, useLocation } from 'react-router-dom';
+import { Home, PlusSquare, User, Trophy, ShieldCheck, BookOpen, LogIn } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
@@ -7,6 +7,7 @@ import { doc, updateDoc } from 'firebase/firestore';
 
 export default function Layout() {
   const { currentUser, userData, isAdmin } = useAuth();
+  const location = useLocation();
   const [showSetup, setShowSetup] = useState(false);
   const [username, setUsername] = useState('');
   const [handle, setHandle] = useState('');
@@ -41,8 +42,9 @@ export default function Layout() {
     }
   };
 
-
-  if (!currentUser) {
+  // Auth Guard for specific routes in Guest Mode
+  const restrictedRoutes = ['/post', '/profile', '/admin'];
+  if (!currentUser && restrictedRoutes.includes(location.pathname)) {
     return <Navigate to="/login" />;
   }
 
@@ -50,8 +52,9 @@ export default function Layout() {
     <div className="app-layout">
       {/* Desktop Sidebar */}
       <aside className="sidebar">
-        <div className="sidebar-logo">
+        <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Link to="/" className="logo">TASK</Link>
+          {!currentUser && <span className="badge badge-gray" style={{ fontSize: '10px' }}>Guest Mode</span>}
         </div>
         <nav className="sidebar-nav">
           <NavLink to="/" className="sidebar-nav-item">
@@ -63,6 +66,9 @@ export default function Layout() {
           <NavLink to="/leaderboard" className="sidebar-nav-item">
             <Trophy size={20} /> Leaders
           </NavLink>
+          <NavLink to="/rules" className="sidebar-nav-item">
+            <BookOpen size={20} /> Circle Rules
+          </NavLink>
           {isAdmin && (
             <NavLink to="/admin" className="sidebar-nav-item">
               <ShieldCheck size={20} /> Admin
@@ -73,7 +79,7 @@ export default function Layout() {
           </NavLink>
         </nav>
         
-        {userData && (
+        {currentUser && userData ? (
           <Link to="/profile" style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--neutral-100)', textDecoration: 'none' }}>
             <div className="avatar avatar-sm" style={{ backgroundColor: 'var(--primary)', color: 'white' }}>
               {userData.username?.charAt(0).toUpperCase()}
@@ -83,17 +89,25 @@ export default function Layout() {
               <div style={{ fontSize: '12px', color: 'var(--neutral-600)' }}>{userData.threadsHandle}</div>
             </div>
           </Link>
+        ) : (
+          <Link to="/login" className="btn-primary" style={{ marginTop: 'auto', gap: '8px' }}>
+             <LogIn size={18} /> Sign In to Join
+          </Link>
         )}
       </aside>
 
       <div className="main-wrapper">
         {/* Mobile Top Header */}
-        <header className="header">
+        <header className="header" style={{ display: 'block' }}>
           <div className="container header-content">
             <Link to="/" className="logo">TASK</Link>
-            {userData && (
+            {currentUser && userData ? (
               <Link to="/profile" className="avatar avatar-sm" style={{ backgroundColor: 'var(--primary)', color: 'white' }}>
                 {userData.username?.charAt(0).toUpperCase()}
+              </Link>
+            ) : (
+              <Link to="/login" className="btn-primary" style={{ padding: '6px 12px', fontSize: '12px' }}>
+                Sign In
               </Link>
             )}
           </div>
@@ -117,12 +131,10 @@ export default function Layout() {
             <Trophy size={22} />
             Leaders
           </NavLink>
-          {isAdmin && (
-            <NavLink to="/admin" className="nav-item">
-              <ShieldCheck size={22} />
-              Admin
-            </NavLink>
-          )}
+          <NavLink to="/rules" className="nav-item">
+            <BookOpen size={22} />
+            Rules
+          </NavLink>
           <NavLink to="/profile" className="nav-item">
             <User size={22} />
             Profile

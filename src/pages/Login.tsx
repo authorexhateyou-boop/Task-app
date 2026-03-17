@@ -77,6 +77,11 @@ export default function Login() {
             />
           </div>
 
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <input type="checkbox" id="remember" style={{ cursor: 'pointer' }} defaultChecked />
+            <label htmlFor="remember" style={{ fontSize: '14px', color: 'var(--neutral-600)', cursor: 'pointer' }}>Remember me</label>
+          </div>
+
           <button type="submit" className="btn-primary" style={{ marginTop: '8px' }} disabled={loading}>
             {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
           </button>

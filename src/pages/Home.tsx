@@ -1,9 +1,9 @@
-import { CheckCircle, ExternalLink, Trash2, User as UserIcon, Heart, Trophy } from 'lucide-react';
+import { CheckCircle, ExternalLink, Trash2, User as UserIcon, Heart, Trophy, LogIn } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, increment, deleteDoc, limit } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface Task {
   id: string;
@@ -16,7 +16,8 @@ interface Task {
 }
 
 export default function Home() {
-  const { userData } = useAuth();
+  const { userData, currentUser } = useAuth();
+  const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [completedTaskIds, setCompletedTaskIds] = useState<string[]>(() => {
     const saved = localStorage.getItem('completed_tasks');
@@ -32,10 +33,12 @@ export default function Home() {
   }, [completedTaskIds]);
 
   useEffect(() => {
+    // Scaling Solution: For 1000+ users, we should use pagination (startAfter)
+    // or separate users into "Circles" (groups) by adding where('circleId', '==', userCircle)
     const q = query(
       collection(db, 'tasks'), 
       orderBy('createdAt', 'desc'),
-      limit(50)
+      limit(50) 
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetchedTasks = snapshot.docs.map(doc => ({
@@ -49,6 +52,10 @@ export default function Home() {
   }, []);
 
   const markComplete = async (taskId: string, creatorId: string) => {
+    if (!currentUser) {
+      navigate('/login');
+      return;
+    }
     if (completedTaskIds.includes(taskId)) return;
     setCompletedTaskIds(prev => [...prev, taskId]);
     try {
@@ -64,6 +71,11 @@ export default function Home() {
       console.error("Mark complete failed:", e);
       setCompletedTaskIds(prev => prev.filter(id => id !== taskId));
     }
+  };
+
+  const getFormatHandle = (handle: string) => {
+    const clean = handle?.replace('@', '').trim();
+    return `https://threads.net/@${clean}`;
   };
 
   const deleteTask = async (taskId: string) => {
@@ -100,6 +112,18 @@ export default function Home() {
       <div className="feed-column">
         <h1 className="page-title">Daily Circle</h1>
         <p className="page-subtitle">Support others to grow your reputation.</p>
+
+        {!currentUser && (
+          <div className="card animate-enter" style={{ backgroundColor: 'var(--accent)', border: '1px solid var(--primary)', padding: '24px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+            <div>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--primary-hover)', marginBottom: '4px' }}>Welcome Passenger! ✈️</h3>
+              <p style={{ fontSize: '14px', color: 'var(--neutral-800)' }}>You are in <strong>Guest Mode</strong>. Watch the circle growth, but sign in to participate.</p>
+            </div>
+            <Link to="/login" className="btn-primary" style={{ whiteSpace: 'nowrap', display: 'flex', gap: '8px' }}>
+              <LogIn size={18} /> Join Now
+            </Link>
+          </div>
+        )}
 
         <div style={{ 
           display: 'flex', 
@@ -172,7 +196,7 @@ export default function Home() {
                       <h3 style={{ fontWeight: 600, fontSize: '18px' }}>{task.creatorName}</h3>
                       <p style={{ color: 'var(--neutral-600)', fontSize: '14px', marginBottom: '8px' }}>
                         <a 
-                          href={`https://threads.net/${task.threadsHandle?.replace('@', '')}`} 
+                          href={getFormatHandle(task.threadsHandle)} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 500 }}
@@ -202,13 +226,13 @@ export default function Home() {
                         <button 
                           className="btn-secondary" 
                           style={{ padding: '8px 12px' }}
-                          onClick={() => window.open(`https://threads.net/${task.threadsHandle?.replace('@', '')}`, '_blank')}
+                          onClick={() => window.open(getFormatHandle(task.threadsHandle), '_blank')}
                         >
                           <ExternalLink size={14} /> Open Link
                         </button>
                         <button 
-                          className="btn-primary" 
-                          style={{ padding: '8px 12px' }}
+                          className={`btn-primary ${!currentUser ? 'disabled' : ''}`}
+                          style={{ padding: '8px 12px', opacity: !currentUser ? 0.6 : 1 }}
                           onClick={() => markComplete(task.id, task.creatorId)}
                         >
                           Mark Complete
