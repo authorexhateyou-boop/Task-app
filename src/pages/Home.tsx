@@ -1,4 +1,4 @@
-import { CheckCircle, ExternalLink, Trash2, User as UserIcon, Heart, Trophy, LogIn } from 'lucide-react';
+import { CheckCircle, ExternalLink, Trash2, User as UserIcon, Heart, Trophy, LogIn, Clock } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, increment, deleteDoc, limit } from 'firebase/firestore';
@@ -13,6 +13,7 @@ interface Task {
   niche: string;
   completionCount: number;
   isActive: boolean;
+  createdAt?: any;
 }
 
 export default function Home() {
@@ -107,6 +108,20 @@ export default function Home() {
     };
   };
 
+  const getTimeAgo = (timestamp: any) => {
+    if (!timestamp) return 'just now';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    
+    if (seconds < 60) return 'just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+  };
+
   return (
     <div className="home-grid">
       <div className="feed-column">
@@ -125,21 +140,27 @@ export default function Home() {
           </div>
         )}
 
+        {/* Sticky Mobile Category Bar */}
         <div style={{ 
+          position: 'sticky', 
+          top: '0',
+          zIndex: 10,
+          backgroundColor: '#f8fafc', // match background
+          margin: '0 -24px 24px -24px', // bleed out to edges
+          padding: '12px 24px',
           display: 'flex', 
           gap: '8px', 
           overflowX: 'auto', 
-          paddingBottom: '12px', 
-          marginBottom: '16px',
           msOverflowStyle: 'none',
-          scrollbarWidth: 'none'
+          scrollbarWidth: 'none',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
         }}>
           {niches.map(n => (
             <button
               key={n}
               onClick={() => setNicheFilter(n)}
               style={{
-                padding: '6px 16px',
+                padding: '8px 16px',
                 borderRadius: '20px',
                 fontSize: '13px',
                 fontWeight: 600,
@@ -149,7 +170,8 @@ export default function Home() {
                 backgroundColor: nicheFilter === n ? 'var(--accent)' : 'white',
                 color: nicheFilter === n ? 'var(--primary)' : 'var(--neutral-600)',
                 cursor: 'pointer',
-                transition: 'all 0.2s'
+                transition: 'all 0.2s',
+                flexShrink: 0
               }}
             >
               {n}
@@ -194,7 +216,7 @@ export default function Home() {
                     </div>
                     <div>
                       <h3 style={{ fontWeight: 600, fontSize: '18px' }}>{task.creatorName}</h3>
-                      <p style={{ color: 'var(--neutral-600)', fontSize: '14px', marginBottom: '8px' }}>
+                      <p style={{ color: 'var(--neutral-600)', fontSize: '14px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <a 
                           href={getFormatHandle(task.threadsHandle)} 
                           target="_blank" 
@@ -202,7 +224,13 @@ export default function Home() {
                           style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 500 }}
                         >
                           {task.threadsHandle}
-                        </a> • {task.niche}
+                        </a>
+                        <span>•</span>
+                        <span>{task.niche}</span>
+                        <span>•</span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', opacity: 0.8 }}>
+                          <Clock size={12} /> {getTimeAgo(task.createdAt)}
+                        </span>
                       </p>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--neutral-600)', fontSize: '12px' }}>
                         <CheckCircle size={14} /> {task.completionCount || 0} completions

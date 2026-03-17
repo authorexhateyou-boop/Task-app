@@ -7,7 +7,7 @@ import { Trash2, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 
 export default function Admin() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, currentUser } = useAuth();
   const [users, setUsers] = useState<UserData[]>([]);
   
   useEffect(() => {
@@ -53,7 +53,12 @@ export default function Admin() {
   };
 
   const resetStats = async (uid: string) => {
-    const confirm = window.confirm('Are you sure you want to RESET all stats for this user to zero?');
+    if (uid === currentUser?.uid) {
+      alert("You cannot reset your own stats. Ask another admin or do it manually in Firebase.");
+      return;
+    }
+
+    const confirm = window.confirm('Are you sure you want to RESET all stats for this user to zero? This includes score, tasks posted, and streaks.');
     if (!confirm) return;
 
     try {
