@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import type { User } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 
 export interface UserData {
   uid: string;
@@ -42,34 +42,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    let unsubDoc: (() => void) | undefined;
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
+      
+      if (unsubDoc) {
+        unsubDoc();
+        unsubDoc = undefined;
+      }
+
       if (user) {
-        // Fetch or create user data in Firestore
         const userRef = doc(db, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
-        
-        if (userSnap.exists()) {
-          setUserData(userSnap.data() as UserData);
-        } else {
-          const newUserData: UserData = {
-            uid: user.uid,
-            username: user.email?.split('@')[0] || 'User',
-            email: user.email || '',
-            threadsHandle: '',
-            taskScore: 0,
-            streak: 0
-          };
-          await setDoc(userRef, newUserData);
-          setUserData(newUserData);
-        }
+        unsubDoc = onSnapshot(userRef, (docSnap) => {
+          if (docSnap.exists()) {
+            setUserData(docSnap.data() as UserData);
+          } else {
+            const newUserData: UserData = {
+              uid: user.uid,
+              username: user.email?.split('@')[0] || 'User',
+              email: user.email || '',
+              threadsHandle: '',
+              taskScore: 0,
+              streak: 0
+            };
+            setDoc(userRef, newUserData);
+            setUserData(newUserData);
+          }
+          setLoading(false);
+        });
       } else {
         setUserData(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+      if (unsubDoc) unsubDoc();
+    };
   }, []);
 
   return (

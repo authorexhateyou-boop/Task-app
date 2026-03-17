@@ -1,4 +1,4 @@
-import { PlusCircle, CheckCircle } from 'lucide-react';
+import { PlusCircle, CheckCircle, Instagram, Twitter, Music2, AtSign, Youtube, Tv } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
@@ -102,12 +102,34 @@ export default function PostTask() {
               </h2>
               
               <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px', marginBottom: '16px' }}>
-                <span className="badge badge-gray" style={{ fontSize: '11px', padding: '4px 10px' }}>{userData.threadsHandle}</span>
-                {userData.instagramHandle && <span className="badge badge-gray" style={{ fontSize: '11px', padding: '4px 10px', color: '#E1306C' }}>IG</span>}
-                {userData.twitterHandle && <span className="badge badge-gray" style={{ fontSize: '11px', padding: '4px 10px', color: '#1DA1F2' }}>X</span>}
-                {userData.tiktokHandle && <span className="badge badge-gray" style={{ fontSize: '11px', padding: '4px 10px' }}>TT</span>}
-                {userData.youtubeHandle && <span className="badge badge-gray" style={{ fontSize: '11px', padding: '4px 10px', color: '#FF0000' }}>YT</span>}
-                {userData.twitchHandle && <span className="badge badge-gray" style={{ fontSize: '11px', padding: '4px 10px', color: '#6441A5' }}>TW</span>}
+                <span className="badge badge-gray" style={{ fontSize: '13px', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <AtSign size={14} /> {userData.threadsHandle}
+                </span>
+                {userData.instagramHandle && (
+                  <span className="badge badge-gray" style={{ fontSize: '13px', padding: '8px 14px', color: '#E1306C', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Instagram size={14} /> {userData.instagramHandle}
+                  </span>
+                )}
+                {userData.twitterHandle && (
+                  <span className="badge badge-gray" style={{ fontSize: '13px', padding: '8px 14px', color: '#1DA1F2', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Twitter size={14} /> {userData.twitterHandle}
+                  </span>
+                )}
+                {userData.tiktokHandle && (
+                  <span className="badge badge-gray" style={{ fontSize: '13px', padding: '8px 14px', color: '#000000', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Music2 size={14} /> {userData.tiktokHandle}
+                  </span>
+                )}
+                {userData.youtubeHandle && (
+                  <span className="badge badge-gray" style={{ fontSize: '13px', padding: '8px 14px', color: '#FF0000', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Youtube size={14} /> {userData.youtubeHandle}
+                  </span>
+                )}
+                {userData.twitchHandle && (
+                  <span className="badge badge-gray" style={{ fontSize: '13px', padding: '8px 14px', color: '#6441A5', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Tv size={14} /> {userData.twitchHandle}
+                  </span>
+                )}
               </div>
 
               <div style={{ display: 'inline-block', border: '1px solid var(--primary)', color: 'var(--primary)', padding: '4px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 600 }}>
