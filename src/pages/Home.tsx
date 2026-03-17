@@ -145,82 +145,88 @@ export default function Home() {
           </div>
         )}
 
-        {/* Sticky Category Bar */}
-        <div className="category-bar">
-          {niches.map(n => (
-            <button
-              key={n}
-              onClick={() => setNicheFilter(n)}
-              style={{
-                padding: '8px 18px',
-                borderRadius: '24px',
-                fontSize: '14px',
-                fontWeight: 700,
-                whiteSpace: 'nowrap',
-                border: '1.5px solid',
-                borderColor: nicheFilter === n ? 'var(--primary)' : 'var(--neutral-200)',
-                backgroundColor: nicheFilter === n ? 'var(--primary)' : 'white',
-                color: nicheFilter === n ? 'white' : 'var(--neutral-600)',
-                cursor: 'pointer',
-                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                flexShrink: 0,
-                boxShadow: nicheFilter === n ? '0 4px 12px rgba(22, 163, 74, 0.2)' : 'none'
-              }}
+        {/* Container for feed with strict width control */}
+        <div style={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
+          {/* Sticky Category Bar */}
+          <div className="category-bar">
+            {niches.map(n => (
+              <button
+                key={n}
+                onClick={() => setNicheFilter(n)}
+                style={{
+                  padding: '8px 18px',
+                  borderRadius: '24px',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  whiteSpace: 'nowrap',
+                  border: '1.5px solid',
+                  borderColor: nicheFilter === n ? 'var(--primary)' : 'var(--neutral-200)',
+                  backgroundColor: nicheFilter === n ? 'var(--primary)' : 'white',
+                  color: nicheFilter === n ? 'white' : 'var(--neutral-600)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                  flexShrink: 0,
+                  boxShadow: nicheFilter === n ? '0 4px 12px rgba(22, 163, 74, 0.2)' : 'none'
+                }}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+            <button 
+              onClick={() => setFilter('pending')}
+              className={`badge ${filter === 'pending' ? 'badge-green' : 'badge-gray'}`}
+              style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
             >
-              {n}
+              Pending ({tasks.filter(t => !completedTaskIds.includes(t.id)).length})
             </button>
-          ))}
-        </div>
+            <button 
+              onClick={() => setFilter('all')}
+              className={`badge ${filter === 'all' ? 'badge-green' : 'badge-gray'}`}
+              style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
+            >
+              All ({tasks.length})
+            </button>
+          </div>
 
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none' }}>
-          <button 
-            onClick={() => setFilter('pending')}
-            className={`badge ${filter === 'pending' ? 'badge-green' : 'badge-gray'}`}
-            style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', cursor: 'pointer', whiteSpace: 'nowrap' }}
-          >
-            Not Completed ({tasks.filter(t => !completedTaskIds.includes(t.id)).length})
-          </button>
-          <button 
-            onClick={() => setFilter('all')}
-            className={`badge ${filter === 'all' ? 'badge-green' : 'badge-gray'}`}
-            style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', cursor: 'pointer', whiteSpace: 'nowrap' }}
-          >
-            All Tasks ({tasks.length})
-          </button>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {filteredTasks.length === 0 ? (
-            <div className="card" style={{ textAlign: 'center', padding: '48px 24px' }}>
-              <div style={{ fontSize: '15px', color: 'var(--neutral-600)' }}>
-                {tasks.length === 0 ? "No creators have posted yet." : "No tasks found in this niche."}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
+            {filteredTasks.length === 0 ? (
+              <div className="card" style={{ textAlign: 'center', padding: '48px 24px' }}>
+                <div style={{ fontSize: '15px', color: 'var(--neutral-600)' }}>
+                  {tasks.length === 0 ? "No creators have posted yet." : "No tasks found in this niche."}
+                </div>
               </div>
-            </div>
-          ) : (
-            filteredTasks.map((task) => (
-              <div key={task.id} className="card animate-enter" style={{ padding: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
-                  <div style={{ display: 'flex', gap: '12px', minWidth: '0', flex: '1 1 200px' }}>
-                    <div 
-                      className="avatar avatar-md" 
-                      style={{ ...getAvatarStyle(task.creatorName || 'U'), flexShrink: 0 }}
-                    >
-                      {task.creatorName ? task.creatorName.charAt(0).toUpperCase() : <UserIcon size={18} />}
-                    </div>
-                    <div style={{ minWidth: 0, flex: 1 }}>
-                      <h3 style={{ fontWeight: 700, fontSize: '16px', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.creatorName}</h3>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px', color: 'var(--neutral-600)', fontSize: '13px', marginBottom: '8px' }}>
-                        <a 
-                          href={getFormatHandle(task.threadsHandle)} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}
-                        >
-                          {task.threadsHandle.startsWith('@') ? task.threadsHandle : `@${task.threadsHandle}`}
-                        </a>
-                        <span style={{ opacity: 0.5 }}>•</span>
-                        <span style={{ fontWeight: 500 }}>{task.niche}</span>
+            ) : (
+              filteredTasks.map((task) => (
+                <div key={task.id} className="card animate-enter" style={{ padding: '16px', boxSizing: 'border-box' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                      <div 
+                        className="avatar avatar-md" 
+                        style={{ ...getAvatarStyle(task.creatorName || 'U'), flexShrink: 0 }}
+                      >
+                        {task.creatorName ? task.creatorName.charAt(0).toUpperCase() : <UserIcon size={18} />}
                       </div>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <h3 style={{ fontWeight: 700, fontSize: '16px', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.creatorName}</h3>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--neutral-600)', fontSize: '13px' }}>
+                          <a 
+                            href={getFormatHandle(task.threadsHandle)} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                          >
+                            {task.threadsHandle.startsWith('@') ? task.threadsHandle : `@${task.threadsHandle}`}
+                          </a>
+                          <span style={{ opacity: 0.5 }}>•</span>
+                          <span style={{ fontWeight: 500 }}>{task.niche}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--neutral-100)', paddingTop: '12px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--neutral-500)', fontSize: '12px' }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                           <CheckCircle size={14} /> {task.completionCount || 0}
@@ -229,45 +235,45 @@ export default function Home() {
                           <Clock size={14} /> {getTimeAgo(task.createdAt)}
                         </span>
                       </div>
+
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        {userData?.uid === task.creatorId ? (
+                          <button 
+                            className="btn-secondary" 
+                            style={{ padding: '6px 12px', color: 'var(--danger)', borderColor: 'var(--danger-bg)', fontSize: '13px' }}
+                            onClick={() => deleteTask(task.id)}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        ) : completedTaskIds.includes(task.id) ? (
+                          <div className="badge badge-green" style={{ padding: '6px 16px', height: '32px' }}>Done</div>
+                        ) : (
+                          <>
+                            <a 
+                              href={getFormatHandle(task.threadsHandle)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn-secondary" 
+                              style={{ padding: '6px 12px', fontSize: '13px' }}
+                            >
+                              <ExternalLink size={14} />
+                            </a>
+                            <button 
+                              className={`btn-primary ${!currentUser ? 'disabled' : ''}`}
+                              style={{ padding: '6px 16px', opacity: !currentUser ? 0.6 : 1, fontSize: '13px' }}
+                              onClick={() => markComplete(task.id, task.creatorId)}
+                            >
+                              Done
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'nowrap', justifyContent: 'flex-end', alignItems: 'center', marginLeft: 'auto' }}>
-                    {userData?.uid === task.creatorId ? (
-                      <button 
-                        className="btn-secondary" 
-                        style={{ padding: '8px 12px', color: 'var(--danger)', borderColor: 'var(--danger-bg)' }}
-                        onClick={() => deleteTask(task.id)}
-                      >
-                        <Trash2 size={14} /> Delete
-                      </button>
-                    ) : completedTaskIds.includes(task.id) ? (
-                      <div className="badge badge-green" style={{ padding: '8px 24px' }}>Done</div>
-                    ) : (
-                      <>
-                        <a 
-                          href={getFormatHandle(task.threadsHandle)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn-secondary" 
-                          style={{ padding: '8px 12px' }}
-                        >
-                          <ExternalLink size={14} /> View
-                        </a>
-                        <button 
-                          className={`btn-primary ${!currentUser ? 'disabled' : ''}`}
-                          style={{ padding: '8px 12px', opacity: !currentUser ? 0.6 : 1 }}
-                          onClick={() => markComplete(task.id, task.creatorId)}
-                        >
-                          Done
-                        </button>
-                      </>
-                    )}
-                  </div>
                 </div>
-              </div>
-            ))
-          )}
+              ))
+            )}
+          </div>
         </div>
       </div>
 
