@@ -43,6 +43,12 @@ export default function Leaderboard() {
     };
   };
 
+  const getFormatHandle = (handle: string) => {
+    if (!handle) return '#';
+    const clean = handle.trim().replace(/^@/, '');
+    return `https://www.threads.net/@${clean}`;
+  };
+
   return (
     <div className="centered-content">
       <h1 className="page-title">Top Members</h1>
@@ -67,7 +73,16 @@ export default function Leaderboard() {
                 <div>
                   <h3 style={{ fontWeight: 600, fontSize: '16px' }}>{user.username}</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--neutral-600)', fontSize: '12px' }}>
-                    <span style={{ fontWeight: 500 }}>{user.threadsHandle || '@user'}</span> • <Activity size={12} /> {user.streak || 0}d streak
+                    <a 
+                      href={getFormatHandle(user.threadsHandle || '')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}
+                    >
+                      {user.threadsHandle || '@user'}
+                    </a>
+                    <span>•</span>
+                    <Activity size={12} /> {user.streak || 0}d streak
                   </div>
                 </div>
               </div>

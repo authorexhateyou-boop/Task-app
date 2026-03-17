@@ -75,6 +75,12 @@ export default function Admin() {
     }
   };
 
+  const getFormatHandle = (handle: string) => {
+    if (!handle) return '#';
+    const clean = handle.trim().replace(/^@/, '');
+    return `https://www.threads.net/@${clean}`;
+  };
+
   if (!isAdmin) {
     return <Navigate to="/" />;
   }
@@ -96,7 +102,14 @@ export default function Admin() {
                 <div>
                   <h3 style={{ fontWeight: 600, fontSize: '16px' }}>{user.username} {user.isAdmin && <span className="badge badge-green" style={{ marginLeft: '8px' }}>Admin</span>}</h3>
                   <div style={{ color: 'var(--neutral-600)', fontSize: '13px', marginTop: '4px' }}>
-                    {user.email} • {user.threadsHandle || 'No handle'}
+                    {user.email} • <a 
+                      href={getFormatHandle(user.threadsHandle || '')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}
+                    >
+                      {user.threadsHandle || 'No handle'}
+                    </a>
                   </div>
                   <div style={{ marginTop: '4px', fontWeight: 600, color: 'var(--primary)', fontSize: '14px' }}>
                     Score: {user.taskScore || 0}

@@ -75,8 +75,9 @@ export default function Home() {
   };
 
   const getFormatHandle = (handle: string) => {
-    const clean = handle?.replace('@', '').trim();
-    return `https://threads.net/@${clean}`;
+    if (!handle) return '#';
+    const clean = handle.trim().replace(/^@/, '');
+    return `https://www.threads.net/@${clean}`;
   };
 
   const deleteTask = async (taskId: string) => {
@@ -239,13 +240,15 @@ export default function Home() {
                       <div className="badge badge-green" style={{ padding: '8px 16px', textAlign: 'center' }}>Done</div>
                     ) : (
                       <>
-                        <button 
+                        <a 
+                          href={getFormatHandle(task.threadsHandle)}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="btn-secondary" 
                           style={{ padding: '8px 12px' }}
-                          onClick={() => window.open(getFormatHandle(task.threadsHandle), '_blank')}
                         >
                           <ExternalLink size={14} /> Open Link
-                        </button>
+                        </a>
                         <button 
                           className={`btn-primary ${!currentUser ? 'disabled' : ''}`}
                           style={{ padding: '8px 12px', opacity: !currentUser ? 0.6 : 1 }}

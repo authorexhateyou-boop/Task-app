@@ -78,6 +78,12 @@ export default function Profile() {
     };
   };
 
+  const getFormatHandle = (handle: string) => {
+    if (!handle) return '#';
+    const clean = handle.trim().replace(/^@/, '');
+    return `https://www.threads.net/@${clean}`;
+  };
+
   return (
     <div className="centered-content">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
@@ -143,7 +149,16 @@ export default function Profile() {
           <>
             <h2 style={{ fontSize: '20px', fontWeight: 700, margin: '0 0 4px 0' }}>{username}</h2>
             <p style={{ color: 'var(--neutral-600)', marginBottom: '16px' }}>
-              {threadsHandle || '@threads_handle'} • {niche || 'General'}
+              <a 
+                href={getFormatHandle(threadsHandle)}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}
+              >
+                {threadsHandle || '@threads_handle'}
+              </a>
+              <span style={{ margin: '0 8px' }}>•</span>
+              {niche || 'General'}
             </p>
           </>
         )}
