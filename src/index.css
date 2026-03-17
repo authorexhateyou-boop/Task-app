@@ -14,6 +14,9 @@
   --danger-hover: #DC2626;
   --danger-bg: #FEE2E2;
 
+  --sidebar-width: 260px;
+  --header-height: 64px;
+
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
@@ -58,9 +61,41 @@ input, select, textarea {
 
 /* Utilities */
 .container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.centered-content {
   max-width: 600px;
   margin: 0 auto;
-  padding: 0 16px;
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (min-width: 1025px) {
+  .home-grid {
+    grid-template-columns: 1fr 320px;
+  }
+}
+
+.side-rail {
+  display: none;
+  position: sticky;
+  top: 24px;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (min-width: 1025px) {
+  .side-rail {
+    display: flex;
+  }
 }
 
 .card {
@@ -135,12 +170,13 @@ input, select, textarea {
 }
 
 .header {
-  height: 64px;
+  height: var(--header-height);
   background-color: white;
   border-bottom: 1px solid var(--neutral-200);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 20;
+  display: none; /* Hidden on desktop */
 }
 .header-content {
   display: flex;
@@ -156,11 +192,63 @@ input, select, textarea {
   display: flex;
   align-items: center;
   text-transform: uppercase;
+  text-decoration: none;
+}
+/* Desktop Sidebar */
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: white;
+  border-right: 1px solid var(--neutral-200);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  z-index: 30;
+}
+
+.sidebar-logo {
+  margin-bottom: 40px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  color: var(--neutral-600);
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.sidebar-nav-item:hover {
+  background-color: var(--neutral-100);
+  color: var(--neutral-900);
+}
+
+.sidebar-nav-item.active {
+  background-color: var(--accent);
+  color: var(--primary);
+}
+
+.main-wrapper {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  background-color: var(--neutral-100);
 }
 
 .desktop-nav {
-  display: flex;
-  gap: 16px;
+  display: none; /* We use sidebar now */
 }
 .desktop-nav .btn-ghost {
   display: flex;
@@ -179,12 +267,34 @@ input, select, textarea {
   height: 64px;
   background-color: white;
   border-top: 1px solid var(--neutral-200);
-  z-index: 10;
+  z-index: 20;
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    display: none;
+  }
+  .main-wrapper {
+    margin-left: 0;
+  }
+  .header {
+    display: block;
+  }
+  .container {
+    max-width: 600px; /* Centered content on tablet/mobile */
+  }
 }
 
 @media (max-width: 640px) {
-  .desktop-nav {
-    display: none;
+  .header-content {
+    justify-content: space-between; /* Keep logo left on mobile too */
+  }
+  .logo {
+    font-size: 22px;
+  }
+  main.container {
+    padding-bottom: 88px !important; /* space for bottom nav */
+    padding-top: 16px !important;
   }
   .mobile-nav {
     display: flex;
@@ -208,17 +318,8 @@ input, select, textarea {
   .mobile-nav .nav-item.active {
     color: var(--primary);
   }
-  .mobile-nav .nav-item.active svg {
-    color: var(--primary);
-  }
-  .header-content {
-    justify-content: space-between; /* Keep logo left on mobile too */
-  }
-  .logo {
-    font-size: 22px;
-  }
-  main.container {
-    padding-bottom: 88px !important; /* space for bottom nav */
+  .mobile-nav .nav-item svg {
+    margin-bottom: -2px;
   }
 }
 

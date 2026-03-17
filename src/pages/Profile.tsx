@@ -79,7 +79,7 @@ export default function Profile() {
   };
 
   return (
-    <div>
+    <div className="centered-content">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <h1 className="page-title" style={{ margin: 0 }}>My Profile</h1>
         <div style={{ display: 'flex', gap: '8px' }}>

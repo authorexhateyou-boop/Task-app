@@ -57,7 +57,7 @@ export default function Admin() {
   }
 
   return (
-    <div>
+    <div className="centered-content">
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
         <ShieldCheck size={28} color="var(--primary)" />
         <h1 className="page-title" style={{ margin: 0 }}>Admin Panel</h1>

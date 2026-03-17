@@ -41,68 +41,94 @@ export default function Layout() {
     }
   };
 
-  const getDesktopNavClass = ({ isActive }: { isActive: boolean }) => 
-    `btn-ghost ${isActive ? 'active' : ''}`;
 
   if (!currentUser) {
     return <Navigate to="/login" />;
   }
 
   return (
-    <div>
-      <header className="header">
-        <div className="container header-content">
+    <div className="app-layout">
+      {/* Desktop Sidebar */}
+      <aside className="sidebar">
+        <div className="sidebar-logo">
           <Link to="/" className="logo">TASK</Link>
-          <nav className="desktop-nav">
-            <NavLink to="/" className={getDesktopNavClass} style={({isActive}) => isActive ? { color: 'var(--primary)', backgroundColor: 'var(--accent)' } : {}}>
-              <Home size={18} /> Home
-            </NavLink>
-            <NavLink to="/post" className={getDesktopNavClass} style={({isActive}) => isActive ? { color: 'var(--primary)', backgroundColor: 'var(--accent)' } : {}}>
-              <PlusSquare size={18} /> Post
-            </NavLink>
-            <NavLink to="/leaderboard" className={getDesktopNavClass} style={({isActive}) => isActive ? { color: 'var(--primary)', backgroundColor: 'var(--accent)' } : {}}>
-              <Trophy size={18} /> Leaders
-            </NavLink>
-            {isAdmin && (
-              <NavLink to="/admin" className={getDesktopNavClass} style={({isActive}) => isActive ? { color: 'var(--primary)', backgroundColor: 'var(--accent)' } : {}}>
-                <ShieldCheck size={18} /> Admin
-              </NavLink>
-            )}
-            <NavLink to="/profile" className={getDesktopNavClass} style={({isActive}) => isActive ? { color: 'var(--primary)', backgroundColor: 'var(--accent)' } : {}}>
-              <User size={18} /> Profile
-            </NavLink>
-          </nav>
         </div>
-      </header>
-
-      <nav className="mobile-nav">
-        <NavLink to="/" className="nav-item">
-          <Home size={22} />
-          Home
-        </NavLink>
-        <NavLink to="/post" className="nav-item">
-          <PlusSquare size={22} />
-          Post
-        </NavLink>
-        <NavLink to="/leaderboard" className="nav-item">
-          <Trophy size={22} />
-          Leaders
-        </NavLink>
-        {isAdmin && (
-          <NavLink to="/admin" className="nav-item">
-            <ShieldCheck size={22} />
-            Admin
+        <nav className="sidebar-nav">
+          <NavLink to="/" className="sidebar-nav-item">
+            <Home size={20} /> Home
           </NavLink>
+          <NavLink to="/post" className="sidebar-nav-item">
+            <PlusSquare size={20} /> Post Task
+          </NavLink>
+          <NavLink to="/leaderboard" className="sidebar-nav-item">
+            <Trophy size={20} /> Leaders
+          </NavLink>
+          {isAdmin && (
+            <NavLink to="/admin" className="sidebar-nav-item">
+              <ShieldCheck size={20} /> Admin
+            </NavLink>
+          )}
+          <NavLink to="/profile" className="sidebar-nav-item">
+            <User size={20} /> My Profile
+          </NavLink>
+        </nav>
+        
+        {userData && (
+          <Link to="/profile" style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--neutral-100)', textDecoration: 'none' }}>
+            <div className="avatar avatar-sm" style={{ backgroundColor: 'var(--primary)', color: 'white' }}>
+              {userData.username?.charAt(0).toUpperCase()}
+            </div>
+            <div style={{ overflow: 'hidden' }}>
+              <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--neutral-900)', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{userData.username}</div>
+              <div style={{ fontSize: '12px', color: 'var(--neutral-600)' }}>{userData.threadsHandle}</div>
+            </div>
+          </Link>
         )}
-        <NavLink to="/profile" className="nav-item">
-          <User size={22} />
-          Profile
-        </NavLink>
-      </nav>
+      </aside>
 
-      <main className="container animate-enter" style={{ padding: '24px 16px', minHeight: 'calc(100vh - 64px)' }}>
-        <Outlet />
-      </main>
+      <div className="main-wrapper">
+        {/* Mobile Top Header */}
+        <header className="header">
+          <div className="container header-content">
+            <Link to="/" className="logo">TASK</Link>
+            {userData && (
+              <Link to="/profile" className="avatar avatar-sm" style={{ backgroundColor: 'var(--primary)', color: 'white' }}>
+                {userData.username?.charAt(0).toUpperCase()}
+              </Link>
+            )}
+          </div>
+        </header>
+
+        <main className="container animate-enter" style={{ minHeight: 'calc(100vh - var(--header-height))' }}>
+          <Outlet />
+        </main>
+
+        {/* Mobile Bottom Navigation */}
+        <nav className="mobile-nav">
+          <NavLink to="/" className="nav-item">
+            <Home size={22} />
+            Home
+          </NavLink>
+          <NavLink to="/post" className="nav-item">
+            <PlusSquare size={22} />
+            Post
+          </NavLink>
+          <NavLink to="/leaderboard" className="nav-item">
+            <Trophy size={22} />
+            Leaders
+          </NavLink>
+          {isAdmin && (
+            <NavLink to="/admin" className="nav-item">
+              <ShieldCheck size={22} />
+              Admin
+            </NavLink>
+          )}
+          <NavLink to="/profile" className="nav-item">
+            <User size={22} />
+            Profile
+          </NavLink>
+        </nav>
+      </div>
 
       {showSetup && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'white', zIndex: 100, display: 'flex', flexDirection: 'column', padding: '24px', justifyContent: 'center' }}>

@@ -57,7 +57,7 @@ export default function PostTask() {
   };
 
   return (
-    <div>
+    <div className="centered-content">
       <h1 className="page-title">Post Daily Task</h1>
       <p className="page-subtitle">Submit your Threads profile for today's circle drop.</p>
 

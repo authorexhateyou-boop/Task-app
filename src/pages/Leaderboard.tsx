@@ -42,7 +42,7 @@ export default function Leaderboard() {
   };
 
   return (
-    <div>
+    <div className="centered-content">
       <h1 className="page-title">Top Members</h1>
       <p className="page-subtitle">Ranked by Task Score in your Circle.</p>
 
