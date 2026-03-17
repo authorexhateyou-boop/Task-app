@@ -99,14 +99,13 @@ main.container {
   top: 0;
   z-index: 10;
   background-color: white;
-  margin: 0 -16px 20px -16px;
-  padding: 12px 16px;
+  margin: 0 -16px 20px -16px; 
+  padding: 14px 16px;
   display: flex;
-  gap: 8px;
+  gap: 10px;
   overflow-x: auto;
   scrollbar-width: none;
-  border-bottom: 2px solid var(--neutral-100);
-  -webkit-overflow-scrolling: touch; 
+  border-bottom: 1px solid var(--neutral-200); /* Thin distinct line */
 }
 
 .category-bar::-webkit-scrollbar {
@@ -184,30 +183,29 @@ main.container {
 .card {
   background-color: var(--secondary);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  padding: 16px;
-  border: 1px solid var(--neutral-200);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06); /* More defined shadow */
+  padding: 20px;
+  border: 1.5px solid var(--neutral-200); /* Slightly thicker border for "own thing" look */
   width: 100%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 @media (max-width: 640px) {
   .task-grid .card {
-    min-height: 200px;
-    padding: 12px;
+    min-height: auto; /* Remove square constraint */
+    padding: 20px;
   }
 }
 
 @media (max-width: 640px) {
   .task-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* Clear spacing between rectangle cards */
     width: 100%;
-    padding: 2px; /* Small buffer for shadows */
+    padding: 0;
   }
 }
 

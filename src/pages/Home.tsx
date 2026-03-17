@@ -162,9 +162,9 @@ export default function Home() {
             </button>
           </div>
 
-          <div className="task-grid">
+          <div className="task-grid" style={{ marginTop: '12px' }}>
             {filteredTasks.length === 0 ? (
-              <div className="card" style={{ gridColumn: 'span 2', textAlign: 'center', padding: '48px 24px' }}>
+              <div className="card" style={{ textAlign: 'center', padding: '48px 24px' }}>
                 <div style={{ fontSize: '15px', color: 'var(--neutral-600)' }}>
                   {tasks.length === 0 ? "No creators have posted yet." : "No tasks found in this niche."}
                 </div>
@@ -172,69 +172,72 @@ export default function Home() {
             ) : (
               filteredTasks.map((task) => (
                 <div key={task.id} className="card animate-enter">
-                  {/* Card Header: Avatar & Name */}
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '6px', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    {/* Left: Avatar */}
                     <div 
                       className="avatar avatar-md" 
                       style={{ ...getAvatarStyle(task.creatorName || 'U') }}
                     >
                       {task.creatorName ? task.creatorName.charAt(0).toUpperCase() : <UserIcon size={18} />}
                     </div>
-                    <div style={{ width: '100%', minWidth: 0 }}>
-                      <h3 style={{ fontWeight: 800, fontSize: '14px', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--neutral-900)' }}>
-                        {task.creatorName}
-                      </h3>
-                      <a 
-                        href={getFormatHandle(task.threadsHandle)} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, fontSize: '11px', display: 'block', marginTop: '1px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                      >
-                        {task.threadsHandle.startsWith('@') ? task.threadsHandle : `@${task.threadsHandle}`}
-                      </a>
-                    </div>
-                  </div>
 
-                  {/* Task Metadata */}
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginBottom: '14px', flexWrap: 'wrap' }}>
-                    <span className="badge badge-gray" style={{ fontSize: '9px', padding: '2px 6px' }}>{task.niche}</span>
-                    <div style={{ fontSize: '11px', color: 'var(--neutral-500)', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                      <CheckCircle size={10} /> {task.completionCount || 0}
-                    </div>
-                  </div>
-
-                  {/* Action Section */}
-                  <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    {userData?.uid === task.creatorId ? (
-                      <button 
-                        className="btn-secondary" 
-                        style={{ padding: '8px', color: 'var(--danger)', borderColor: 'var(--danger-bg)', width: '100%', fontSize: '12px', borderRadius: 'var(--radius-md)' }}
-                        onClick={() => deleteTask(task.id)}
-                      >
-                        <Trash2 size={13} /> Delete
-                      </button>
-                    ) : completedTaskIds.includes(task.id) ? (
-                      <div className="badge badge-green" style={{ width: '100%', height: '34px', justifyContent: 'center', borderRadius: 'var(--radius-md)', fontSize: '12px' }}>Done</div>
-                    ) : (
-                      <>
+                    {/* Middle: Content */}
+                    <div style={{ flex: 1, minWidth: '150px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                        <h3 style={{ fontWeight: 800, fontSize: '16px', margin: 0, color: 'var(--neutral-900)' }}>
+                          {task.creatorName}
+                        </h3>
+                        <span className="badge badge-gray" style={{ fontSize: '10px' }}>{task.niche}</span>
+                      </div>
+                      
+                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                         <a 
-                          href={getFormatHandle(task.threadsHandle)}
-                          target="_blank"
+                          href={getFormatHandle(task.threadsHandle)} 
+                          target="_blank" 
                           rel="noopener noreferrer"
-                          className="btn-secondary" 
-                          style={{ width: '100%', padding: '7px', fontSize: '12px', borderRadius: 'var(--radius-md)' }}
+                          style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, fontSize: '13px' }}
                         >
-                          <ExternalLink size={13} /> View
+                          {task.threadsHandle.startsWith('@') ? task.threadsHandle : `@${task.threadsHandle}`}
                         </a>
+                        <span style={{ fontSize: '12px', color: 'var(--neutral-400)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <CheckCircle size={12} /> {task.completionCount || 0} supporters
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Right: Actions */}
+                    <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
+                      {userData?.uid === task.creatorId ? (
                         <button 
-                          className={`btn-primary ${!currentUser ? 'disabled' : ''}`}
-                          style={{ width: '100%', padding: '7px', opacity: !currentUser ? 0.6 : 1, fontSize: '12px', borderRadius: 'var(--radius-md)' }}
-                          onClick={() => markComplete(task.id, task.creatorId)}
+                          className="btn-secondary" 
+                          style={{ padding: '10px', color: 'var(--danger)', borderColor: 'var(--danger-bg)' }}
+                          onClick={() => deleteTask(task.id)}
                         >
-                          Mark Done
+                          <Trash2 size={16} />
                         </button>
-                      </>
-                    )}
+                      ) : completedTaskIds.includes(task.id) ? (
+                        <div className="badge badge-green" style={{ height: '40px', padding: '0 20px', fontSize: '14px' }}>Done</div>
+                      ) : (
+                        <>
+                          <a 
+                            href={getFormatHandle(task.threadsHandle)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn-secondary" 
+                            style={{ padding: '10px 16px' }}
+                          >
+                            <ExternalLink size={16} />
+                          </a>
+                          <button 
+                            className={`btn-primary ${!currentUser ? 'disabled' : ''}`}
+                            style={{ padding: '10px 20px', opacity: !currentUser ? 0.6 : 1 }}
+                            onClick={() => markComplete(task.id, task.creatorId)}
+                          >
+                            Done
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))
