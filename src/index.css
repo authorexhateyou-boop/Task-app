@@ -40,6 +40,7 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  width: 100%;
 }
 
 button {
@@ -64,7 +65,9 @@ input, select, textarea {
 .container {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 0 16px; /* Reduced mobile padding for more space */
+  padding: 0 16px; 
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 769px) {
@@ -74,7 +77,8 @@ input, select, textarea {
 }
 
 main.container {
-  padding: 48px 24px; /* Specific top/bottom padding for the content area */
+  padding-top: 24px;
+  padding-bottom: 24px;
 }
 
 .centered-content {
@@ -93,11 +97,11 @@ main.container {
   position: sticky;
   top: 0;
   z-index: 10;
-  background-color: rgba(248, 250, 252, 0.9);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  margin: 0 -24px 24px -24px;
-  padding: 12px 24px;
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  margin: 0 -16px 24px -16px;
+  padding: 12px 16px;
   display: flex;
   gap: 10px;
   overflow-x: auto;
@@ -323,7 +327,10 @@ main.container {
 }
 
 .app-layout {
-  overflow-x: hidden;
+  overflow-x: clip; /* Modern way to hide horizontal without breaking sticky */
+  width: 100%;
+  position: relative;
+  min-height: 100vh;
 }
 
 .desktop-nav {
@@ -360,7 +367,7 @@ main.container {
 
 @media (max-width: 768px) {
   .container {
-    max-width: 100%; /* Full width on mobile containers */
+    padding: 0 16px;
   }
 }
 

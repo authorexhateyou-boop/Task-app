@@ -200,14 +200,14 @@ export default function Home() {
             filteredTasks.map((task) => (
               <div key={task.id} className="card animate-enter" style={{ padding: '16px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
-                  <div style={{ display: 'flex', gap: '12px', flex: '1', minWidth: '200px' }}>
+                  <div style={{ display: 'flex', gap: '12px', minWidth: '0', flex: '1 1 200px' }}>
                     <div 
                       className="avatar avatar-md" 
                       style={{ ...getAvatarStyle(task.creatorName || 'U'), flexShrink: 0 }}
                     >
                       {task.creatorName ? task.creatorName.charAt(0).toUpperCase() : <UserIcon size={18} />}
                     </div>
-                    <div style={{ minWidth: 0 }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
                       <h3 style={{ fontWeight: 700, fontSize: '16px', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.creatorName}</h3>
                       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px', color: 'var(--neutral-600)', fontSize: '13px', marginBottom: '8px' }}>
                         <a 
@@ -232,17 +232,17 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '8px', width: '100%', justifyContent: 'flex-end', marginTop: '4px' }}>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'nowrap', justifyContent: 'flex-end', alignItems: 'center', marginLeft: 'auto' }}>
                     {userData?.uid === task.creatorId ? (
                       <button 
                         className="btn-secondary" 
-                        style={{ padding: '8px 12px', color: 'var(--danger)', borderColor: 'var(--danger-bg)', flex: '1', maxWidth: '120px' }}
+                        style={{ padding: '8px 12px', color: 'var(--danger)', borderColor: 'var(--danger-bg)' }}
                         onClick={() => deleteTask(task.id)}
                       >
                         <Trash2 size={14} /> Delete
                       </button>
                     ) : completedTaskIds.includes(task.id) ? (
-                      <div className="badge badge-green" style={{ padding: '8px 24px', flex: '1', maxWidth: '120px', justifyContent: 'center' }}>Done</div>
+                      <div className="badge badge-green" style={{ padding: '8px 24px' }}>Done</div>
                     ) : (
                       <>
                         <a 
@@ -250,13 +250,13 @@ export default function Home() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="btn-secondary" 
-                          style={{ padding: '8px 12px', flex: '1', maxWidth: '120px' }}
+                          style={{ padding: '8px 12px' }}
                         >
                           <ExternalLink size={14} /> View
                         </a>
                         <button 
                           className={`btn-primary ${!currentUser ? 'disabled' : ''}`}
-                          style={{ padding: '8px 12px', opacity: !currentUser ? 0.6 : 1, flex: '1', maxWidth: '140px' }}
+                          style={{ padding: '8px 12px', opacity: !currentUser ? 0.6 : 1 }}
                           onClick={() => markComplete(task.id, task.creatorId)}
                         >
                           Done
