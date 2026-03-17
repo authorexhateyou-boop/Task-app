@@ -185,7 +185,7 @@ export default function Profile() {
         </button>
       </div>
 
-      <div className="card" style={{ padding: '24px', border: '2px dashed var(--primary)', backgroundColor: 'var(--accent)', textAlign: 'center' }}>
+      <div className="card" style={{ padding: '24px', backgroundColor: 'var(--accent)', textAlign: 'center' }}>
         <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '8px', color: 'var(--primary-hover)' }}>Love TASK?</h3>
         <p style={{ fontSize: '13px', color: 'var(--neutral-800)', marginBottom: '16px' }}>Support the app to keep it alive!</p>
         

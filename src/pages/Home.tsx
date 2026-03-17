@@ -255,7 +255,7 @@ export default function Home() {
           </div>
         )}
 
-        <div className="card" style={{ padding: '24px', backgroundColor: 'var(--accent)', border: '1px solid var(--primary)' }}>
+        <div className="card" style={{ padding: '24px', backgroundColor: 'var(--accent)' }}>
           <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '8px', color: 'var(--primary-hover)' }}>Elevate TASK</h3>
           <p style={{ fontSize: '13px', color: 'var(--neutral-800)', marginBottom: '16px', lineHeight: 1.4 }}>Help us bring more creators into the circle and keep the platform free for everyone.</p>
           <button 
