@@ -1,4 +1,4 @@
-import { Settings, LogOut, FileText, CheckCircle, Save, Trash2, User as UserIcon, Heart, Instagram, Twitter, Music2, AtSign } from 'lucide-react';
+import { Settings, LogOut, FileText, CheckCircle, Save, Trash2, User as UserIcon, Heart, Instagram, Twitter, Music2, AtSign, Youtube, Tv } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { auth, db } from '../lib/firebase';
@@ -12,6 +12,8 @@ export default function Profile() {
   const [instagramHandle, setInstagramHandle] = useState('');
   const [twitterHandle, setTwitterHandle] = useState('');
   const [tiktokHandle, setTiktokHandle] = useState('');
+  const [youtubeHandle, setYoutubeHandle] = useState('');
+  const [twitchHandle, setTwitchHandle] = useState('');
   const [niche, setNiche] = useState('General');
   const [saving, setSaving] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -23,6 +25,8 @@ export default function Profile() {
       setInstagramHandle(userData.instagramHandle || '');
       setTwitterHandle(userData.twitterHandle || '');
       setTiktokHandle(userData.tiktokHandle || '');
+      setYoutubeHandle(userData.youtubeHandle || '');
+      setTwitchHandle(userData.twitchHandle || '');
       setNiche(userData.niche || 'General');
     }
   }, [userData]);
@@ -41,6 +45,8 @@ export default function Profile() {
         instagramHandle: instagramHandle ? `@${clean(instagramHandle)}` : '',
         twitterHandle: twitterHandle ? `@${clean(twitterHandle)}` : '',
         tiktokHandle: tiktokHandle ? `@${clean(tiktokHandle)}` : '',
+        youtubeHandle: youtubeHandle ? `@${clean(youtubeHandle)}` : '',
+        twitchHandle: twitchHandle ? `@${clean(twitchHandle)}` : '',
         niche: niche
       });
       setEditMode(false);
@@ -99,6 +105,8 @@ export default function Profile() {
       case 'instagram': return `https://www.instagram.com/${clean}`;
       case 'twitter': return `https://twitter.com/${clean}`;
       case 'tiktok': return `https://www.tiktok.com/@${clean}`;
+      case 'youtube': return `https://www.youtube.com/@${clean}`;
+      case 'twitch': return `https://www.twitch.tv/${clean}`;
       default: return '#';
     }
   };
@@ -139,45 +147,65 @@ export default function Profile() {
               style={{ width: '100%', textAlign: 'center', fontSize: '20px', fontWeight: 700, border: 'none', background: 'var(--neutral-100)', padding: '4px', marginBottom: '8px', borderRadius: '4px' }}
               placeholder="Display Name"
             />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '8px 12px', borderRadius: 'var(--radius-md)', gap: '8px' }}>
-                <AtSign size={14} color="var(--neutral-600)" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '6px 10px', borderRadius: 'var(--radius-md)', gap: '6px' }}>
+                <AtSign size={12} color="var(--neutral-600)" />
                 <input 
                   value={threadsHandle} 
                   onChange={(e) => setThreadsHandle(e.target.value)} 
                   className="input-field" 
-                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '14px', width: '100%' }}
+                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '13px', width: '100%' }}
                   placeholder="Threads"
                 />
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '8px 12px', borderRadius: 'var(--radius-md)', gap: '8px' }}>
-                <Instagram size={14} color="#E1306C" />
+              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '6px 10px', borderRadius: 'var(--radius-md)', gap: '6px' }}>
+                <Instagram size={12} color="#E1306C" />
                 <input 
                   value={instagramHandle} 
                   onChange={(e) => setInstagramHandle(e.target.value)} 
                   className="input-field" 
-                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '14px', width: '100%' }}
+                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '13px', width: '100%' }}
                   placeholder="Instagram"
                 />
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '8px 12px', borderRadius: 'var(--radius-md)', gap: '8px' }}>
-                <Twitter size={14} color="#1DA1F2" />
+              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '6px 10px', borderRadius: 'var(--radius-md)', gap: '6px' }}>
+                <Twitter size={12} color="#1DA1F2" />
                 <input 
                   value={twitterHandle} 
                   onChange={(e) => setTwitterHandle(e.target.value)} 
                   className="input-field" 
-                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '14px', width: '100%' }}
+                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '13px', width: '100%' }}
                   placeholder="Twitter"
                 />
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '8px 12px', borderRadius: 'var(--radius-md)', gap: '8px' }}>
-                <Music2 size={14} color="#000000" />
+              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '6px 10px', borderRadius: 'var(--radius-md)', gap: '6px' }}>
+                <Music2 size={12} color="#000000" />
                 <input 
                   value={tiktokHandle} 
                   onChange={(e) => setTiktokHandle(e.target.value)} 
                   className="input-field" 
-                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '14px', width: '100%' }}
+                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '13px', width: '100%' }}
                   placeholder="TikTok"
+                />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '6px 10px', borderRadius: 'var(--radius-md)', gap: '6px' }}>
+                <Youtube size={12} color="#FF0000" />
+                <input 
+                  value={youtubeHandle} 
+                  onChange={(e) => setYoutubeHandle(e.target.value)} 
+                  className="input-field" 
+                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '13px', width: '100%' }}
+                  placeholder="YouTube"
+                />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '6px 10px', borderRadius: 'var(--radius-md)', gap: '6px' }}>
+                <Tv size={12} color="#6441A5" />
+                <input 
+                  value={twitchHandle} 
+                  onChange={(e) => setTwitchHandle(e.target.value)} 
+                  className="input-field" 
+                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '13px', width: '100%' }}
+                  placeholder="Twitch"
                 />
               </div>
             </div>
@@ -216,6 +244,16 @@ export default function Profile() {
                 {userData?.tiktokHandle && (
                   <a href={getSocialUrl('tiktok', userData.tiktokHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#000000' }}>
                     <Music2 size={18} />
+                  </a>
+                )}
+                {userData?.youtubeHandle && (
+                  <a href={getSocialUrl('youtube', userData.youtubeHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#FF0000' }}>
+                    <Youtube size={18} />
+                  </a>
+                )}
+                {userData?.twitchHandle && (
+                  <a href={getSocialUrl('twitch', userData.twitchHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#6441A5' }}>
+                    <Tv size={18} />
                   </a>
                 )}
               </div>

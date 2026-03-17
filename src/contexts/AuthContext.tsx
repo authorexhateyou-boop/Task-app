@@ -12,6 +12,8 @@ export interface UserData {
   instagramHandle?: string;
   twitterHandle?: string;
   tiktokHandle?: string;
+  youtubeHandle?: string;
+  twitchHandle?: string;
   niche?: string;
   taskScore: number;
   streak: number;

@@ -94,11 +94,21 @@ export default function PostTask() {
         ) : (
           <div>
             <div style={{ marginBottom: '24px' }}>
-              <p style={{ color: 'var(--neutral-600)', marginBottom: '8px' }}>You are posting as:</p>
-              <h2 style={{ fontSize: '24px', fontWeight: 700, margin: '0 0 4px 0', color: 'var(--primary)' }}>
-                {userData.threadsHandle}
+              <p style={{ color: 'var(--neutral-600)', marginBottom: '12px' }}>You are posting as:</p>
+              <h2 style={{ fontSize: '26px', fontWeight: 800, margin: '0 0 12px 0', color: 'var(--neutral-900)' }}>
+                {userData.username}
               </h2>
-              <div style={{ display: 'inline-block', backgroundColor: 'var(--neutral-100)', padding: '4px 12px', borderRadius: '16px', fontSize: '13px', color: 'var(--neutral-600)' }}>
+              
+              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px', marginBottom: '16px' }}>
+                <span className="badge badge-gray" style={{ fontSize: '11px', padding: '4px 10px' }}>{userData.threadsHandle}</span>
+                {userData.instagramHandle && <span className="badge badge-gray" style={{ fontSize: '11px', padding: '4px 10px', color: '#E1306C' }}>IG</span>}
+                {userData.twitterHandle && <span className="badge badge-gray" style={{ fontSize: '11px', padding: '4px 10px', color: '#1DA1F2' }}>X</span>}
+                {userData.tiktokHandle && <span className="badge badge-gray" style={{ fontSize: '11px', padding: '4px 10px' }}>TT</span>}
+                {userData.youtubeHandle && <span className="badge badge-gray" style={{ fontSize: '11px', padding: '4px 10px', color: '#FF0000' }}>YT</span>}
+                {userData.twitchHandle && <span className="badge badge-gray" style={{ fontSize: '11px', padding: '4px 10px', color: '#6441A5' }}>TW</span>}
+              </div>
+
+              <div style={{ display: 'inline-block', border: '1px solid var(--primary)', color: 'var(--primary)', padding: '4px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 600 }}>
                 Niche: {userData.niche || 'General'}
               </div>
             </div>

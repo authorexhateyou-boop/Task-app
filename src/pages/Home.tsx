@@ -1,4 +1,4 @@
-import { CheckCircle, ExternalLink, Trash2, User as UserIcon, Heart, Trophy, Instagram, Twitter, Music2, AtSign } from 'lucide-react';
+import { CheckCircle, ExternalLink, Trash2, User as UserIcon, Heart, Trophy, Instagram, Twitter, Music2, AtSign, Youtube, Tv } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, increment, deleteDoc, limit } from 'firebase/firestore';
@@ -13,6 +13,8 @@ interface Task {
   instagramHandle?: string;
   twitterHandle?: string;
   tiktokHandle?: string;
+  youtubeHandle?: string;
+  twitchHandle?: string;
   niche: string;
   completionCount: number;
   isActive: boolean;
@@ -85,6 +87,8 @@ export default function Home() {
       case 'instagram': return `https://www.instagram.com/${clean}`;
       case 'twitter': return `https://twitter.com/${clean}`;
       case 'tiktok': return `https://www.tiktok.com/@${clean}`;
+      case 'youtube': return `https://www.youtube.com/@${clean}`;
+      case 'twitch': return `https://www.twitch.tv/${clean}`;
       default: return '#';
     }
   };
@@ -219,6 +223,16 @@ export default function Home() {
                           {task.tiktokHandle && (
                             <a href={getSocialUrl('tiktok', task.tiktokHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#000000' }} title="TikTok">
                               <Music2 size={18} />
+                            </a>
+                          )}
+                          {task.youtubeHandle && (
+                            <a href={getSocialUrl('youtube', task.youtubeHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#FF0000' }} title="YouTube">
+                              <Youtube size={18} />
+                            </a>
+                          )}
+                          {task.twitchHandle && (
+                            <a href={getSocialUrl('twitch', task.twitchHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#6441A5' }} title="Twitch">
+                              <Tv size={18} />
                             </a>
                           )}
                         </div>
