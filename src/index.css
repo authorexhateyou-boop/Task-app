@@ -63,7 +63,11 @@ input, select, textarea {
 .container {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 24px; /* Restored to horizontal padding only */
+}
+
+main.container {
+  padding: 48px 24px; /* Specific top/bottom padding for the content area */
 }
 
 .centered-content {
@@ -294,7 +298,7 @@ input, select, textarea {
   }
   main.container {
     padding-bottom: 88px !important; /* space for bottom nav */
-    padding-top: 16px !important;
+    padding-top: 24px !important; /* Increased mobile top padding */
   }
   .mobile-nav {
     display: flex;
