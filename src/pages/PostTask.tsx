@@ -40,6 +40,8 @@ export default function PostTask() {
         instagramHandle: userData.instagramHandle || '',
         twitterHandle: userData.twitterHandle || '',
         tiktokHandle: userData.tiktokHandle || '',
+        youtubeHandle: userData.youtubeHandle || '',
+        twitchHandle: userData.twitchHandle || '',
         niche: userData.niche || 'General',
         createdAt: serverTimestamp(),
         completionCount: 0,

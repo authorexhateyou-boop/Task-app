@@ -1,8 +1,9 @@
 import { CheckCircle, ExternalLink, Trash2, User as UserIcon, Heart, Trophy, Instagram, Twitter, Music2, AtSign, Youtube, Tv } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, increment, deleteDoc, limit } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, increment, deleteDoc, limit, getDoc } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
+import type { UserData } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 
 interface Task {
@@ -25,37 +26,62 @@ export default function Home() {
   const { userData, currentUser } = useAuth();
   const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [completedTaskIds, setCompletedTaskIds] = useState<string[]>(() => {
-    const saved = localStorage.getItem('completed_tasks');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [completedTaskIds, setCompletedTaskIds] = useState<string[]>([]);
+  const [creatorSocials, setCreatorSocials] = useState<Record<string, Partial<UserData>>>({});
   const [filter, setFilter] = useState<'all' | 'pending'>('pending');
-  const [nicheFilter, setNicheFilter] = useState<string>('All');
+  const [nicheFilter, setNicheFilter] = useState('All');
 
   const niches = ['All', 'Tech', 'Lifestyle', 'Gaming', 'Education', 'Business', 'Art', 'General'];
 
   useEffect(() => {
-    localStorage.setItem('completed_tasks', JSON.stringify(completedTaskIds));
-  }, [completedTaskIds]);
-
-  useEffect(() => {
-    // Scaling Solution: For 1000+ users, we should use pagination (startAfter)
-    // or separate users into "Circles" (groups) by adding where('circleId', '==', userCircle)
-    const q = query(
-      collection(db, 'tasks'), 
-      orderBy('createdAt', 'desc'),
-      limit(50) 
-    );
+    const q = query(collection(db, 'tasks'), orderBy('createdAt', 'desc'), limit(50));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedTasks = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Task[];
-      setTasks(fetchedTasks);
+      const taskList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
+      setTasks(taskList);
     });
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const fetchMissingSocials = async () => {
+      const creatorIds = [...new Set(tasks.map(t => t.creatorId))];
+      for (const uid of creatorIds) {
+        if (!creatorSocials[uid]) {
+          const userSnap = await getDoc(doc(db, 'users', uid));
+          if (userSnap.exists()) {
+            const data = userSnap.data() as UserData;
+            setCreatorSocials(prev => ({
+              ...prev,
+              [uid]: {
+                threadsHandle: data.threadsHandle,
+                instagramHandle: data.instagramHandle,
+                twitterHandle: data.twitterHandle,
+                tiktokHandle: data.tiktokHandle,
+                youtubeHandle: data.youtubeHandle,
+                twitchHandle: data.twitchHandle
+              }
+            }));
+          }
+        }
+      }
+    };
+    if (tasks.length > 0) fetchMissingSocials();
+  }, [tasks]);
+
+  useEffect(() => {
+    let unsubUser: () => void = () => {};
+    if (currentUser) {
+      const userRef = doc(db, 'users', currentUser.uid);
+      unsubUser = onSnapshot(userRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setCompletedTaskIds(data.completedTasks || []);
+        }
+      });
+    }
+    return () => unsubUser();
+  }, [currentUser]);
 
   const markComplete = async (taskId: string, creatorId: string) => {
     if (!currentUser) {
@@ -63,7 +89,7 @@ export default function Home() {
       return;
     }
     if (completedTaskIds.includes(taskId)) return;
-    setCompletedTaskIds(prev => [...prev, taskId]);
+    
     try {
       await updateDoc(doc(db, 'tasks', taskId), { completionCount: increment(1) });
       await updateDoc(doc(db, 'users', creatorId), { taskScore: increment(1) });
@@ -210,28 +236,28 @@ export default function Home() {
                         </a>
                         
                         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                          {task.instagramHandle && (
-                            <a href={getSocialUrl('instagram', task.instagramHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#E1306C' }} title="Instagram">
+                          {(creatorSocials[task.creatorId]?.instagramHandle || task.instagramHandle) && (
+                            <a href={getSocialUrl('instagram', creatorSocials[task.creatorId]?.instagramHandle || task.instagramHandle || '')} target="_blank" rel="noopener noreferrer" style={{ color: '#E1306C' }} title="Instagram">
                               <Instagram size={18} />
                             </a>
                           )}
-                          {task.twitterHandle && (
-                            <a href={getSocialUrl('twitter', task.twitterHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#1DA1F2' }} title="X (Twitter)">
+                          {(creatorSocials[task.creatorId]?.twitterHandle || task.twitterHandle) && (
+                            <a href={getSocialUrl('twitter', creatorSocials[task.creatorId]?.twitterHandle || task.twitterHandle || '')} target="_blank" rel="noopener noreferrer" style={{ color: '#1DA1F2' }} title="X (Twitter)">
                               <Twitter size={18} />
                             </a>
                           )}
-                          {task.tiktokHandle && (
-                            <a href={getSocialUrl('tiktok', task.tiktokHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#000000' }} title="TikTok">
+                          {(creatorSocials[task.creatorId]?.tiktokHandle || task.tiktokHandle) && (
+                            <a href={getSocialUrl('tiktok', creatorSocials[task.creatorId]?.tiktokHandle || task.tiktokHandle || '')} target="_blank" rel="noopener noreferrer" style={{ color: '#000000' }} title="TikTok">
                               <Music2 size={18} />
                             </a>
                           )}
-                          {task.youtubeHandle && (
-                            <a href={getSocialUrl('youtube', task.youtubeHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#FF0000' }} title="YouTube">
+                          {(creatorSocials[task.creatorId]?.youtubeHandle || task.youtubeHandle) && (
+                            <a href={getSocialUrl('youtube', creatorSocials[task.creatorId]?.youtubeHandle || task.youtubeHandle || '')} target="_blank" rel="noopener noreferrer" style={{ color: '#FF0000' }} title="YouTube">
                               <Youtube size={18} />
                             </a>
                           )}
-                          {task.twitchHandle && (
-                            <a href={getSocialUrl('twitch', task.twitchHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#6441A5' }} title="Twitch">
+                          {(creatorSocials[task.creatorId]?.twitchHandle || task.twitchHandle) && (
+                            <a href={getSocialUrl('twitch', creatorSocials[task.creatorId]?.twitchHandle || task.twitchHandle || '')} target="_blank" rel="noopener noreferrer" style={{ color: '#6441A5' }} title="Twitch">
                               <Tv size={18} />
                             </a>
                           )}
