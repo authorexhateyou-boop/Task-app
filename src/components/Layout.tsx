@@ -98,7 +98,7 @@ export default function Layout() {
 
       <div className="main-wrapper">
         {/* Mobile Top Header */}
-        <header className="header" style={{ display: 'block' }}>
+        <header className="header">
           <div className="container header-content">
             <Link to="/" className="logo">TASK</Link>
             {currentUser && userData ? (

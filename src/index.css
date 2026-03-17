@@ -39,6 +39,7 @@ body {
   color: var(--neutral-900);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 button {
@@ -97,13 +98,13 @@ main.container {
   transition: top 0.3s ease;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .category-bar {
     top: var(--header-height);
   }
 }
 
-@media (min-width: 1025px) {
+@media (min-width: 769px) {
   .home-grid {
     grid-template-columns: 1fr 320px;
   }
@@ -117,7 +118,7 @@ main.container {
   gap: 24px;
 }
 
-@media (min-width: 1025px) {
+@media (min-width: 769px) {
   .side-rail {
     display: flex;
   }
@@ -201,7 +202,13 @@ main.container {
   position: sticky;
   top: 0;
   z-index: 20;
-  display: none; /* Hidden on desktop */
+  display: block; /* Default mobile */
+}
+
+@media (min-width: 769px) {
+  .header {
+    display: none;
+  }
 }
 .header-content {
   display: flex;
@@ -221,6 +228,7 @@ main.container {
 }
 /* Desktop Sidebar */
 .sidebar {
+  display: none; /* Default mobile */
   width: var(--sidebar-width);
   height: 100vh;
   position: fixed;
@@ -229,9 +237,14 @@ main.container {
   background-color: white;
   border-right: 1px solid var(--neutral-200);
   padding: 24px;
-  display: flex;
   flex-direction: column;
   z-index: 30;
+}
+
+@media (min-width: 769px) {
+  .sidebar {
+    display: flex;
+  }
 }
 
 .sidebar-logo {
@@ -267,9 +280,20 @@ main.container {
 }
 
 .main-wrapper {
-  margin-left: var(--sidebar-width);
+  margin-left: 0; /* Default mobile */
   min-height: 100vh;
   background-color: var(--neutral-100);
+  width: auto;
+}
+
+@media (min-width: 769px) {
+  .main-wrapper {
+    margin-left: var(--sidebar-width);
+  }
+}
+
+.app-layout {
+  overflow-x: hidden;
 }
 
 .desktop-nav {
@@ -284,7 +308,9 @@ main.container {
 }
 
 .mobile-nav {
-  display: none;
+  display: flex; /* Default mobile */
+  justify-content: space-around;
+  align-items: center;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -293,20 +319,18 @@ main.container {
   background-color: white;
   border-top: 1px solid var(--neutral-200);
   z-index: 20;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
-@media (max-width: 1024px) {
-  .sidebar {
+@media (min-width: 769px) {
+  .mobile-nav {
     display: none;
   }
-  .main-wrapper {
-    margin-left: 0;
-  }
-  .header {
-    display: block;
-  }
+}
+
+@media (max-width: 768px) {
   .container {
-    max-width: 600px; /* Centered content on tablet/mobile */
+    max-width: 100%; /* Full width on mobile containers */
   }
 }
 
