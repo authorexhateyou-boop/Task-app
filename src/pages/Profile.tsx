@@ -1,9 +1,75 @@
-import { Settings, LogOut, FileText, CheckCircle, Save, Trash2, User as UserIcon, Heart, Instagram, Twitter, Music2, AtSign, Youtube, Tv } from 'lucide-react';
+import { Settings, LogOut, FileText, CheckCircle, Save, Trash2, User as UserIcon, Heart, ExternalLink } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { auth, db } from '../lib/firebase';
 import { signOut, deleteUser } from 'firebase/auth';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+
+function SocialIcon({ platform, size = 20 }: { platform: string; size?: number }) {
+  switch (platform) {
+    case 'threads':
+      return (
+        <svg width={size} height={size} viewBox="0 0 192 192" fill="currentColor">
+          <path d="M141.537 88.988a66.667 66.667 0 0 0-2.518-1.143c-1.482-27.307-16.403-42.94-41.457-43.1h-.368c-14.972 0-27.457 6.365-35.142 17.933l13.61 9.328c5.741-8.696 14.767-10.555 21.532-10.555h.253c8.326.054 14.605 2.472 18.662 7.19 2.95 3.468 4.926 8.299 5.906 14.434a73.169 73.169 0 0 0-23.785-.963c-23.253 2.515-38.233 15.981-37.32 36.21.467 10.276 5.577 19.103 14.397 24.907 7.451 4.951 17.051 7.388 27.04 6.926 13.171-.613 23.52-5.72 30.762-15.186 5.545-7.28 9.053-16.712 10.618-28.564 6.369 3.843 11.08 8.9 13.699 14.945 4.522 10.493 4.785 27.718-9.442 41.914-12.508 12.478-27.555 17.882-50.286 18.043-25.22-.176-44.332-8.279-56.807-24.083-11.814-15.005-17.93-36.762-18.184-64.691.254-27.929 6.37-49.686 18.184-64.691 12.475-15.804 31.587-23.907 56.807-24.083 25.4.179 44.967 8.321 57.144 24.196 5.985 7.762 10.485 17.618 13.3 29.037l15.94-4.241c-3.428-13.316-8.866-24.932-16.257-34.534C154.44 12.215 130.04 1.987 96.254 1.75h-.509c-33.677.24-58.706 10.502-74.384 30.495C7.56 50.536.25 76.116 0 108.005v.5c.25 31.888 7.56 57.469 21.36 75.765 15.678 19.993 40.707 30.255 74.384 30.495h.509c30.226-.213 51.408-8.141 68.828-25.503 22.947-22.888 22.133-51.575 14.612-69.195-5.458-12.634-15.946-22.914-37.156-31.079z"/>
+          <path d="M99.654 133.748c-11.126.52-22.794-4.37-23.467-16.42-.509-9.15 6.467-19.348 27.556-20.576a120.46 120.46 0 0 1 20.194.998c-2.296 28.527-13.559 35.425-24.283 36z"/>
+        </svg>
+      );
+    case 'tiktok':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/>
+        </svg>
+      );
+    case 'instagram':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+        </svg>
+      );
+    case 'twitter':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+        </svg>
+      );
+    case 'youtube':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+        </svg>
+      );
+    case 'twitch':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
+
+const getSocialUrl = (platform: string, handle: string) => {
+  const clean = handle.replace(/^@/, '');
+  switch (platform) {
+    case 'threads': return `https://www.threads.net/@${clean}`;
+    case 'instagram': return `https://www.instagram.com/${clean}`;
+    case 'twitter': return `https://twitter.com/${clean}`;
+    case 'tiktok': return `https://www.tiktok.com/@${clean}`;
+    case 'youtube': return `https://www.youtube.com/@${clean}`;
+    case 'twitch': return `https://www.twitch.tv/${clean}`;
+    default: return '#';
+  }
+};
+
+const PLATFORM_COLORS: Record<string, string> = {
+  threads: '#000', tiktok: '#010101', instagram: '#E1306C',
+  youtube: '#FF0000', twitter: '#000', twitch: '#6441A5',
+};
+const PLATFORM_LABELS: Record<string, string> = {
+  threads: 'Threads', tiktok: 'TikTok', instagram: 'Instagram',
+  youtube: 'YouTube', twitter: 'Twitter / X', twitch: 'Twitch',
+};
 
 export default function Profile() {
   const { userData, currentUser } = useAuth();
@@ -34,10 +100,7 @@ export default function Profile() {
   const saveProfile = async () => {
     if (!userData) return;
     setSaving(true);
-    
-    // Helper to clean handles
     const clean = (h: string) => h.trim().replace(/^@/, '');
-
     try {
       await updateDoc(doc(db, 'users', userData.uid), {
         username: username.trim(),
@@ -47,10 +110,9 @@ export default function Profile() {
         tiktokHandle: tiktokHandle ? `@${clean(tiktokHandle)}` : '',
         youtubeHandle: youtubeHandle ? `@${clean(youtubeHandle)}` : '',
         twitchHandle: twitchHandle ? `@${clean(twitchHandle)}` : '',
-        niche: niche
+        niche,
       });
       setEditMode(false);
-      alert('Profile updated!');
     } catch (e) {
       console.error(e);
       alert('Failed to save profile');
@@ -59,60 +121,45 @@ export default function Profile() {
     }
   };
 
-  const handleSignout = () => {
-    signOut(auth);
-  };
+  const handleSignout = () => signOut(auth);
 
   const handleDeleteAccount = async () => {
     if (!currentUser || !userData) return;
-    
-    const confirmDelete = window.confirm("Are you sure you want to completely delete your TASK account? This action cannot be undone.");
-    if (!confirmDelete) return;
-
+    if (!window.confirm('Are you sure you want to delete your account? This cannot be undone.')) return;
     try {
-      if (userData?.uid) await deleteDoc(doc(db, 'users', userData.uid));
+      await deleteDoc(doc(db, 'users', userData.uid));
       await deleteUser(currentUser);
     } catch (e: any) {
-      console.error(e);
       if (e.code === 'auth/requires-recent-login') {
-        alert("For security reasons, please sign out, sign back in, and try deleting your account again.");
+        alert('Please sign out, sign back in, and try again.');
       } else {
-        alert("Failed to delete account. See console for details.");
+        alert('Failed to delete account.');
       }
     }
   };
 
-  // Helper for colorful avatars without storage
   const getAvatarStyle = (name: string) => {
     const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5', '#9B59B6'];
-    const index = (name?.length || 0) % colors.length;
     return {
-      backgroundColor: colors[index],
-      color: 'white',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontWeight: 800,
-      fontSize: '32px'
+      backgroundColor: colors[(name?.length || 0) % colors.length],
+      color: 'white', display: 'flex', alignItems: 'center',
+      justifyContent: 'center', fontWeight: 800, fontSize: '32px',
     };
   };
 
-  const getSocialUrl = (platform: string, handle: string) => {
-    if (!handle) return '#';
-    const clean = handle.trim().replace(/^@/, '');
-    switch(platform) {
-      case 'threads': return `https://www.threads.net/@${clean}`;
-      case 'instagram': return `https://www.instagram.com/${clean}`;
-      case 'twitter': return `https://twitter.com/${clean}`;
-      case 'tiktok': return `https://www.tiktok.com/@${clean}`;
-      case 'youtube': return `https://www.youtube.com/@${clean}`;
-      case 'twitch': return `https://www.twitch.tv/${clean}`;
-      default: return '#';
-    }
-  };
+  // All platforms the user has set up — used in view mode
+  const connectedPlatforms = [
+    { id: 'threads', handle: userData?.threadsHandle },
+    { id: 'tiktok', handle: userData?.tiktokHandle },
+    { id: 'instagram', handle: userData?.instagramHandle },
+    { id: 'youtube', handle: userData?.youtubeHandle },
+    { id: 'twitter', handle: userData?.twitterHandle },
+    { id: 'twitch', handle: userData?.twitchHandle },
+  ].filter(p => p.handle && (p.handle as string).trim() !== '');
 
   return (
     <div className="centered-content">
+      {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <h1 className="page-title" style={{ margin: 0 }}>My Profile</h1>
         <div style={{ display: 'flex', gap: '8px' }}>
@@ -121,167 +168,131 @@ export default function Profile() {
               <Save size={20} color={saving ? 'gray' : 'var(--primary)'} />
             </button>
           )}
-          <button className="btn-ghost" onClick={() => setEditMode(!editMode)} style={{ padding: '8px', color: editMode ? 'var(--primary)' : 'var(--neutral-800)' }}>
+          <button
+            className="btn-ghost"
+            onClick={() => setEditMode(!editMode)}
+            style={{ padding: '8px', color: editMode ? 'var(--primary)' : 'var(--neutral-800)' }}
+          >
             <Settings size={20} />
           </button>
         </div>
       </div>
 
+      {/* Avatar card */}
       <div className="card" style={{ textAlign: 'center', padding: '32px 24px', marginBottom: '24px' }}>
-        <div 
-          className="avatar avatar-lg" 
-          style={{ 
-            margin: '0 auto 16px', 
-            ...getAvatarStyle(username || 'U') 
-          }}
-        >
+        <div className="avatar avatar-lg" style={{ margin: '0 auto 16px', ...getAvatarStyle(username || 'U') }}>
           {username ? username.charAt(0).toUpperCase() : <UserIcon size={40} />}
         </div>
-        
+
         {editMode ? (
           <>
-            <input 
-              value={username} 
-              onChange={(e) => setUsername(e.target.value)} 
-              className="input-field" 
-              style={{ width: '100%', textAlign: 'center', fontSize: '20px', fontWeight: 700, border: 'none', background: 'var(--neutral-100)', padding: '4px', marginBottom: '8px', borderRadius: '4px' }}
+            {/* Username */}
+            <input
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              className="input-field"
+              style={{ width: '100%', textAlign: 'center', fontSize: '20px', fontWeight: 700, marginBottom: '20px' }}
               placeholder="Display Name"
             />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '6px 10px', borderRadius: 'var(--radius-md)', gap: '6px' }}>
-                <AtSign size={12} color="var(--neutral-600)" />
-                <input 
-                  value={threadsHandle} 
-                  onChange={(e) => setThreadsHandle(e.target.value)} 
-                  className="input-field" 
-                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '13px', width: '100%' }}
-                  placeholder="Threads"
-                />
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '6px 10px', borderRadius: 'var(--radius-md)', gap: '6px' }}>
-                <Instagram size={12} color="#E1306C" />
-                <input 
-                  value={instagramHandle} 
-                  onChange={(e) => setInstagramHandle(e.target.value)} 
-                  className="input-field" 
-                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '13px', width: '100%' }}
-                  placeholder="Instagram"
-                />
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '6px 10px', borderRadius: 'var(--radius-md)', gap: '6px' }}>
-                <Twitter size={12} color="#1DA1F2" />
-                <input 
-                  value={twitterHandle} 
-                  onChange={(e) => setTwitterHandle(e.target.value)} 
-                  className="input-field" 
-                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '13px', width: '100%' }}
-                  placeholder="Twitter"
-                />
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '6px 10px', borderRadius: 'var(--radius-md)', gap: '6px' }}>
-                <Music2 size={12} color="#000000" />
-                <input 
-                  value={tiktokHandle} 
-                  onChange={(e) => setTiktokHandle(e.target.value)} 
-                  className="input-field" 
-                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '13px', width: '100%' }}
-                  placeholder="TikTok"
-                />
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '6px 10px', borderRadius: 'var(--radius-md)', gap: '6px' }}>
-                <Youtube size={12} color="#FF0000" />
-                <input 
-                  value={youtubeHandle} 
-                  onChange={(e) => setYoutubeHandle(e.target.value)} 
-                  className="input-field" 
-                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '13px', width: '100%' }}
-                  placeholder="YouTube"
-                />
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--neutral-100)', padding: '6px 10px', borderRadius: 'var(--radius-md)', gap: '6px' }}>
-                <Tv size={12} color="#6441A5" />
-                <input 
-                  value={twitchHandle} 
-                  onChange={(e) => setTwitchHandle(e.target.value)} 
-                  className="input-field" 
-                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '13px', width: '100%' }}
-                  placeholder="Twitch"
-                />
-              </div>
+
+            {/* Social handles — one per row */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px', textAlign: 'left' }}>
+              {[
+                { id: 'threads', label: 'Threads', val: threadsHandle, set: setThreadsHandle },
+                { id: 'tiktok', label: 'TikTok', val: tiktokHandle, set: setTiktokHandle },
+                { id: 'instagram', label: 'Instagram', val: instagramHandle, set: setInstagramHandle },
+                { id: 'youtube', label: 'YouTube', val: youtubeHandle, set: setYoutubeHandle },
+                { id: 'twitter', label: 'Twitter / X', val: twitterHandle, set: setTwitterHandle },
+                { id: 'twitch', label: 'Twitch', val: twitchHandle, set: setTwitchHandle },
+              ].map(field => (
+                <div
+                  key={field.id}
+                  style={{
+                    display: 'flex', alignItems: 'center',
+                    background: 'var(--neutral-100)',
+                    padding: '10px 14px', borderRadius: '12px', gap: '12px',
+                  }}
+                >
+                  <div style={{ color: PLATFORM_COLORS[field.id], flexShrink: 0 }}>
+                    <SocialIcon platform={field.id} size={18} />
+                  </div>
+                  <input
+                    value={field.val}
+                    onChange={e => field.set(e.target.value)}
+                    className="input-field"
+                    style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '14px', width: '100%' }}
+                    placeholder={`${field.label} username`}
+                  />
+                </div>
+              ))}
             </div>
-            
-            <div style={{ marginBottom: '20px' }}>
-              <select 
-                value={niche} 
-                onChange={(e) => setNiche(e.target.value)} 
-                className="input-field" 
-                style={{ width: '100%', fontSize: '14px', background: 'var(--accent)', border: '1px solid var(--primary)', borderRadius: 'var(--radius-md)', padding: '8px 12px', textAlign: 'center', fontWeight: 600 }}
-              >
-                {['General', 'Tech', 'Lifestyle', 'Gaming', 'Education', 'Business', 'Art'].map(n => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
-            </div>
+
+            {/* Niche */}
+            <select
+              value={niche}
+              onChange={e => setNiche(e.target.value)}
+              className="input-field"
+              style={{
+                width: '100%', fontSize: '14px', background: 'var(--accent)',
+                border: '1px solid var(--primary)', borderRadius: 'var(--radius-md)',
+                padding: '8px 12px', fontWeight: 600,
+              }}
+            >
+              {['General', 'Tech', 'Lifestyle', 'Gaming', 'Education', 'Business', 'Art'].map(n => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
           </>
         ) : (
           <>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '20px' }}>
-              <span className="badge badge-gray" style={{ fontSize: '12px' }}>{niche}</span>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <a href={getSocialUrl('threads', threadsHandle)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--neutral-800)' }}>
-                  <AtSign size={18} />
-                </a>
-                {userData?.instagramHandle && (
-                  <a href={getSocialUrl('instagram', userData.instagramHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#E1306C' }}>
-                    <Instagram size={18} />
-                  </a>
-                )}
-                {userData?.twitterHandle && (
-                  <a href={getSocialUrl('twitter', userData.twitterHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#000000' }}>
-                    <Twitter size={18} />
-                  </a>
-                )}
-                {userData?.tiktokHandle && (
-                  <a href={getSocialUrl('tiktok', userData.tiktokHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#000000' }}>
-                    <Music2 size={18} />
-                  </a>
-                )}
-                {userData?.youtubeHandle && (
-                  <a href={getSocialUrl('youtube', userData.youtubeHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#FF0000' }}>
-                    <Youtube size={18} />
-                  </a>
-                )}
-                {userData?.twitchHandle && (
-                  <a href={getSocialUrl('twitch', userData.twitchHandle)} target="_blank" rel="noopener noreferrer" style={{ color: '#6441A5' }}>
-                    <Tv size={18} />
-                  </a>
-                )}
-              </div>
+            <h2 style={{ fontWeight: 800, fontSize: '22px', margin: '0 0 4px 0' }}>{userData?.username}</h2>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '20px' }}>
+              <span className="badge badge-green">Circle Starter</span>
+              <span className="badge badge-gray">Score: {userData?.taskScore || 0}</span>
+              <span className="badge badge-gray">{niche}</span>
             </div>
+
+            {/* Connected social links — clicking opens the account page (correct behaviour) */}
+            {connectedPlatforms.length > 0 && (
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                {connectedPlatforms.map(p => (
+                  <a
+                    key={p.id}
+                    href={getSocialUrl(p.id, p.handle as string)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={`${PLATFORM_LABELS[p.id]}: ${p.handle}`}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '6px',
+                      padding: '7px 14px', borderRadius: '20px',
+                      backgroundColor: 'var(--neutral-100)',
+                      color: PLATFORM_COLORS[p.id],
+                      textDecoration: 'none', fontSize: '13px', fontWeight: 600,
+                    }}
+                  >
+                    <SocialIcon platform={p.id} size={16} />
+                    {p.handle}
+                    <ExternalLink size={11} color="var(--neutral-400)" />
+                  </a>
+                ))}
+              </div>
+            )}
           </>
         )}
-        
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-          <span className="badge badge-green">Circle Starter</span>
-          <span className="badge badge-gray">Task Score: {userData?.taskScore || 0}</span>
-        </div>
       </div>
 
+      {/* Stats */}
       <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '16px' }}>Stats</h3>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
         <div className="card" style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ color: 'var(--primary)' }}>
-            <FileText size={20} />
-          </div>
+          <div style={{ color: 'var(--primary)' }}><FileText size={20} /></div>
           <div>
             <div style={{ fontWeight: 700, fontSize: '18px' }}>{userData?.tasksPosted || 0}</div>
             <div style={{ fontSize: '12px', color: 'var(--neutral-600)' }}>Posted</div>
           </div>
         </div>
         <div className="card" style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ color: 'var(--primary)' }}>
-            <CheckCircle size={20} />
-          </div>
+          <div style={{ color: 'var(--primary)' }}><CheckCircle size={20} /></div>
           <div>
             <div style={{ fontWeight: 700, fontSize: '18px' }}>{userData?.tasksCompleted || 0}</div>
             <div style={{ fontSize: '12px', color: 'var(--neutral-600)' }}>Completed</div>
@@ -290,7 +301,7 @@ export default function Profile() {
       </div>
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
-        <button onClick={handleSignout} className="btn-secondary" style={{ flex: 1, color: 'var(--neutral-800)' }}>
+        <button onClick={handleSignout} className="btn-secondary" style={{ flex: 1 }}>
           <LogOut size={16} /> Sign out
         </button>
         <button onClick={handleDeleteAccount} className="btn-secondary" style={{ flex: 1, color: 'var(--danger)', borderColor: 'var(--danger-bg)' }}>
@@ -301,9 +312,8 @@ export default function Profile() {
       <div className="card" style={{ padding: '24px', backgroundColor: 'var(--accent)', textAlign: 'center' }}>
         <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '8px', color: 'var(--primary-hover)' }}>Love TASK?</h3>
         <p style={{ fontSize: '13px', color: 'var(--neutral-800)', marginBottom: '16px' }}>Support the app to keep it alive!</p>
-        
-        <button 
-          className="btn-primary" 
+        <button
+          className="btn-primary"
           style={{ width: '100%', borderRadius: 'var(--radius-full)', fontSize: '16px', padding: '12px' }}
           onClick={() => window.open('https://buy.stripe.com/bJe9AS7UF0yg3d6guz7kc01', '_blank')}
         >

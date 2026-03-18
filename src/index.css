@@ -538,7 +538,38 @@ main.container {
   animation: fadeInScale 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
+/* Only trigger card active scale when the card itself has a role=button or is a button */
 .card:active {
-  transform: scale(0.98);
   transition: transform 0.1s;
+}
+
+/* Platform option rows — standalone clickable items */
+.platform-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 2px solid var(--neutral-200);
+  background-color: #FAFAFA;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.platform-option:hover {
+  border-color: var(--neutral-300);
+  background-color: var(--neutral-100);
+}
+
+.platform-option.selected {
+  border-color: var(--primary);
+  background-color: #F0FFF8;
+}
+
+.platform-option:active {
+  transform: scale(0.98);
 }

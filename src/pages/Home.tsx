@@ -1,21 +1,16 @@
-import { CheckCircle, ExternalLink, Trash2, User as UserIcon, Heart, Trophy, Instagram, Twitter, Music2, AtSign, Youtube, Tv } from 'lucide-react';
+import { CheckCircle, Trash2, User as UserIcon, Heart, Trophy } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, increment, deleteDoc, limit, getDoc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, increment, deleteDoc, limit } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
-import type { UserData } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 
 interface Task {
   id: string;
   creatorId: string;
   creatorName: string;
-  threadsHandle: string;
-  instagramHandle?: string;
-  twitterHandle?: string;
-  tiktokHandle?: string;
-  youtubeHandle?: string;
-  twitchHandle?: string;
+  platform: string;
+  primaryHandle: string;
   niche: string;
   completionCount: number;
   isActive: boolean;
@@ -27,7 +22,6 @@ export default function Home() {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [completedTaskIds, setCompletedTaskIds] = useState<string[]>([]);
-  const [creatorSocials, setCreatorSocials] = useState<Record<string, Partial<UserData>>>({});
   const [filter, setFilter] = useState<'all' | 'pending'>('pending');
   const [nicheFilter, setNicheFilter] = useState('All');
 
@@ -44,32 +38,6 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const fetchMissingSocials = async () => {
-      const creatorIds = [...new Set(tasks.map(t => t.creatorId))];
-      for (const uid of creatorIds) {
-        if (!creatorSocials[uid]) {
-          const userSnap = await getDoc(doc(db, 'users', uid));
-          if (userSnap.exists()) {
-            const data = userSnap.data() as UserData;
-            setCreatorSocials(prev => ({
-              ...prev,
-              [uid]: {
-                threadsHandle: data.threadsHandle,
-                instagramHandle: data.instagramHandle,
-                twitterHandle: data.twitterHandle,
-                tiktokHandle: data.tiktokHandle,
-                youtubeHandle: data.youtubeHandle,
-                twitchHandle: data.twitchHandle
-              }
-            }));
-          }
-        }
-      }
-    };
-    if (tasks.length > 0) fetchMissingSocials();
-  }, [tasks]);
-
-  useEffect(() => {
     let unsubUser: () => void = () => {};
     if (currentUser) {
       const userRef = doc(db, 'users', currentUser.uid);
@@ -82,6 +50,55 @@ export default function Home() {
     }
     return () => unsubUser();
   }, [currentUser]);
+
+  const SocialIcon = ({ platform, size = 18 }: { platform: string, size?: number }) => {
+    switch (platform) {
+      case 'threads':
+        return (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 11.5c0 2.5-1.5 4.5-4 4.5s-4-2-4-4.5S5.5 7 8 7s4 2 4 4.5Z" />
+            <path d="M12 11.5V6" />
+            <path d="M12 11.5c0-1.5 1-2.5 2.5-2.5S17 10 17 11.5c0 4-3.5 7.5-8.5 7.5S2 15.5 2 11.5s5-8.5 10-8.5S22 7.5 22 11.5c0 3-2 5.5-4.5 5.5s-2.5-1.5-2.5-3" />
+          </svg>
+        );
+      case 'tiktok':
+        return (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+          </svg>
+        );
+      case 'instagram':
+        return (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+            <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+          </svg>
+        );
+      case 'twitter':
+        return (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 4l11.733 16h4.267l-11.733 -16z" />
+            <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />
+          </svg>
+        );
+      case 'youtube':
+        return (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 2-2h15a2 2 0 0 1 2 2 24.12 24.12 0 0 1 0 10 2 2 0 0 1-2 2h-15a2 2 0 0 1-2-2Z" />
+            <path d="m10 15 5-3-5-3z" />
+          </svg>
+        );
+      case 'twitch':
+        return (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 2H3v16h5v4l4-4h5l4-4V2zm-10 9V7m5 4V7" />
+          </svg>
+        );
+      default:
+        return <UserIcon size={size} />;
+    }
+  };
 
   const markComplete = async (taskId: string, creatorId: string) => {
     if (!currentUser) {
@@ -101,7 +118,6 @@ export default function Home() {
       }
     } catch (e) {
       console.error("Mark complete failed:", e);
-      setCompletedTaskIds(prev => prev.filter(id => id !== taskId));
     }
   };
 
@@ -139,15 +155,9 @@ export default function Home() {
     const index = (name?.length || 0) % colors.length;
     return {
       backgroundColor: colors[index],
-      color: 'white',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontWeight: 700,
-      fontSize: '18px'
+      color: 'white'
     };
   };
-
 
   return (
     <div className="home-grid">
@@ -165,9 +175,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* Container for feed with strict width control */}
         <div style={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
-          {/* Sticky Category Bar */}
           <div className="category-bar">
             {niches.map(n => (
               <button
@@ -208,7 +216,6 @@ export default function Home() {
               filteredTasks.map((task) => (
                 <div key={task.id} className="card animate-enter">
                   <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
-                    {/* Left: Avatar */}
                     <div 
                       className="avatar avatar-md" 
                       style={{ ...getAvatarStyle(task.creatorName || 'U') }}
@@ -216,91 +223,68 @@ export default function Home() {
                       {task.creatorName ? task.creatorName.charAt(0).toUpperCase() : <UserIcon size={18} />}
                     </div>
 
-                    {/* Middle: Content */}
                     <div style={{ flex: 1, minWidth: '150px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                         <h3 style={{ fontWeight: 800, fontSize: '16px', margin: 0, color: 'var(--neutral-900)' }}>
                           {task.creatorName}
                         </h3>
                         <span className="badge badge-gray" style={{ fontSize: '10px' }}>{task.niche}</span>
                       </div>
                       
-                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                        <a 
-                          href={getSocialUrl('threads', task.threadsHandle)} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}
-                        >
-                          <AtSign size={14} /> {task.threadsHandle}
-                        </a>
-                        
-                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                          {(creatorSocials[task.creatorId]?.instagramHandle || task.instagramHandle) && (
-                            <a href={getSocialUrl('instagram', creatorSocials[task.creatorId]?.instagramHandle || task.instagramHandle || '')} target="_blank" rel="noopener noreferrer" style={{ color: '#E1306C' }} title="Instagram">
-                              <Instagram size={18} />
-                            </a>
-                          )}
-                          {(creatorSocials[task.creatorId]?.twitterHandle || task.twitterHandle) && (
-                            <a href={getSocialUrl('twitter', creatorSocials[task.creatorId]?.twitterHandle || task.twitterHandle || '')} target="_blank" rel="noopener noreferrer" style={{ color: '#1DA1F2' }} title="X (Twitter)">
-                              <Twitter size={18} />
-                            </a>
-                          )}
-                          {(creatorSocials[task.creatorId]?.tiktokHandle || task.tiktokHandle) && (
-                            <a href={getSocialUrl('tiktok', creatorSocials[task.creatorId]?.tiktokHandle || task.tiktokHandle || '')} target="_blank" rel="noopener noreferrer" style={{ color: '#000000' }} title="TikTok">
-                              <Music2 size={18} />
-                            </a>
-                          )}
-                          {(creatorSocials[task.creatorId]?.youtubeHandle || task.youtubeHandle) && (
-                            <a href={getSocialUrl('youtube', creatorSocials[task.creatorId]?.youtubeHandle || task.youtubeHandle || '')} target="_blank" rel="noopener noreferrer" style={{ color: '#FF0000' }} title="YouTube">
-                              <Youtube size={18} />
-                            </a>
-                          )}
-                          {(creatorSocials[task.creatorId]?.twitchHandle || task.twitchHandle) && (
-                            <a href={getSocialUrl('twitch', creatorSocials[task.creatorId]?.twitchHandle || task.twitchHandle || '')} target="_blank" rel="noopener noreferrer" style={{ color: '#6441A5' }} title="Twitch">
-                              <Tv size={18} />
-                            </a>
-                          )}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <a 
+                            href={getSocialUrl(task.platform || 'threads', task.primaryHandle)} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            style={{ 
+                              backgroundColor: 'var(--neutral-900)', 
+                              color: 'white', 
+                              padding: '10px 18px', 
+                              borderRadius: 'var(--radius-md)',
+                              textDecoration: 'none', 
+                              fontWeight: 700, 
+                              fontSize: '15px', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              gap: '10px',
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                            }}
+                          >
+                            <SocialIcon platform={task.platform || 'threads'} size={20} />
+                            {task.primaryHandle}
+                          </a>
                         </div>
-
-                        <span style={{ fontSize: '13px', color: 'var(--neutral-500)', display: 'flex', alignItems: 'center', gap: '4px', marginLeft: 'auto' }}>
-                          <CheckCircle size={14} /> {task.completionCount || 0}
-                        </span>
                       </div>
                     </div>
 
-                    {/* Right: Actions */}
-                    <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
-                      {userData?.uid === task.creatorId ? (
-                        <button 
-                          className="btn-secondary" 
-                          style={{ padding: '10px', color: 'var(--danger)', borderColor: 'var(--danger-bg)' }}
-                          onClick={() => deleteTask(task.id)}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      ) : completedTaskIds.includes(task.id) ? (
-                        <div className="badge badge-green" style={{ height: '40px', padding: '0 20px', fontSize: '14px' }}>Done</div>
-                      ) : (
-                        <>
-                          <a 
-                          href={getSocialUrl('threads', task.threadsHandle)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn-secondary" 
-                          style={{ padding: '10px 16px' }}
-                        >
-                          <ExternalLink size={16} />
-                        </a>
+                    <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                       <div style={{ textAlign: 'right' }}>
+                          <span style={{ fontSize: '12px', color: 'var(--neutral-500)', display: 'block' }}>Success</span>
+                          <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end' }}>
+                            <CheckCircle size={14} /> {task.completionCount || 0}
+                          </span>
+                        </div>
+
+                        {userData?.uid === task.creatorId ? (
+                          <button 
+                            className="btn-secondary" 
+                            style={{ padding: '10px', color: 'var(--danger)', borderColor: 'var(--danger-bg)' }}
+                            onClick={() => deleteTask(task.id)}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        ) : completedTaskIds.includes(task.id) ? (
+                          <div className="badge badge-green" style={{ height: '44px', padding: '0 24px', fontSize: '15px', fontWeight: 700 }}>Done</div>
+                        ) : (
                           <button 
                             className={`btn-primary ${!currentUser ? 'disabled' : ''}`}
-                            style={{ padding: '10px 20px', opacity: !currentUser ? 0.6 : 1 }}
+                            style={{ padding: '12px 24px', opacity: !currentUser ? 0.6 : 1, fontSize: '15px', fontWeight: 700 }}
                             onClick={() => markComplete(task.id, task.creatorId)}
                           >
-                            Done
+                            Complete
                           </button>
-                        </>
-                      )}
+                        )}
                     </div>
                   </div>
                 </div>
@@ -348,7 +332,7 @@ export default function Home() {
           <button 
             className="btn-primary" 
             style={{ width: '100%', borderRadius: 'var(--radius-full)', fontWeight: 700 }}
-            onClick={() => window.open('https://buy.stripe.com/bJe9AS7UF0yg3d6guz7kc01', '_blank')}
+            onClick={() => window.open('https://buy.stripe.com', '_blank')}
           >
             <Heart size={16} fill="white" /> Support Circle $5
           </button>

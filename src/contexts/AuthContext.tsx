@@ -15,6 +15,7 @@ export interface UserData {
   youtubeHandle?: string;
   twitchHandle?: string;
   niche?: string;
+  primaryPlatform?: string;
   taskScore: number;
   streak: number;
   profilePic?: string;
