@@ -19,10 +19,12 @@ export default function Leaderboard() {
   useEffect(() => {
     const q = query(collection(db, 'users'), orderBy('taskScore', 'desc'), limit(10));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const topUsers = snapshot.docs.map(doc => ({
-        ...doc.data(),
-        uid: doc.id
-      })) as BaseUser[];
+      const topUsers = snapshot.docs
+        .map(doc => ({ ...doc.data(), uid: doc.id } as BaseUser))
+        .filter(u => {
+          const name = u.username?.toLowerCase() || '';
+          return !name.includes('test') && !name.includes('admin') && !name.includes('tester');
+        });
       setLeaders(topUsers);
     });
 
