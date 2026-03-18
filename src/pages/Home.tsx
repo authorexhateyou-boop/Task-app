@@ -145,11 +145,6 @@ export default function Home() {
   };
 
   const filteredTasks = tasks.filter(task => {
-    // Hide test data from the circle
-    const name = task.creatorName?.toLowerCase() || '';
-    const isTest = name.includes('test') || name.includes('admin') || name.includes('tester');
-    if (isTest) return false;
-
     const isPending = filter === 'pending' ? !completedTaskIds.includes(task.id) : true;
     const matchesNiche = nicheFilter === 'All' ? true : task.niche === nicheFilter;
     return isPending && matchesNiche;
